@@ -4,11 +4,14 @@
 import { APP_CONFIG, getErrorMessage, getSuccessMessage } from '../config/app.config.js';
 import AirtableClient from '../utils/airtable/client.js';
 import AirtableValidator from '../utils/airtable/validator.js';
+import LineSheetOrganizer from '../utils/formatting/linesheet-organizer.js';
+import DevHelpers from '../../scripts/dev-helpers.js';
 
 class LineSheetApp {
   constructor() {
     this.state = {
       products: [],
+      organizedProducts: null,
       isLoading: false,
       error: null,
       config: {
@@ -178,10 +181,15 @@ class LineSheetApp {
       // Store valid products
       this.state.products = validationResults.valid.map(item => item.product);
       
+      // Organize products for line sheet
+      this.state.organizedProducts = LineSheetOrganizer.organizeGiltyBoyProducts(this.state.products);
+      
       this.updateProductCount(this.state.products.length);
+      this.updateLineSheetStats(this.state.organizedProducts);
       this.renderProductGrid();
       
       console.log(`✅ Loaded ${this.state.products.length} products`);
+      console.log('📊 Line Sheet Organization:', this.state.organizedProducts.summary);
       
     } catch (error) {
       console.error('Failed to fetch products:', error);
@@ -305,8 +313,35 @@ class LineSheetApp {
 
   updateProductCount(count) {
     const countElement = document.getElementById('product-count');
+    const activeCount = this.state.products.filter(p => p.active).length;
+    
     if (countElement) {
-      countElement.textContent = `${count} products loaded`;
+      countElement.textContent = `${count} products loaded (${activeCount} active for line sheet)`;
+    }
+  }
+
+  updateLineSheetStats(organizedProducts) {
+    if (!organizedProducts) return;
+    
+    const statsElement = document.getElementById('linesheet-stats');
+    if (statsElement) {
+      const { summary } = organizedProducts;
+      statsElement.innerHTML = `
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-label">Categories:</span>
+            <span class="stat-value">${summary.totalCategories}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Active Products:</span>
+            <span class="stat-value">${summary.totalProducts}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Total Value:</span>
+            <span class="stat-value">${summary.totalWholesaleValue.toFixed(2)}</span>
+          </div>
+        </div>
+      `;
     }
   }
 
@@ -500,6 +535,13 @@ class LineSheetApp {
 // Initialize application when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   window.app = new LineSheetApp();
+  
+  // Make DevHelpers available globally for console debugging
+  if (import.meta.env.MODE === 'development') {
+    window.DevHelpers = DevHelpers;
+    console.log('🛠️ Development mode: DevHelpers available in console');
+    console.log('💡 Try: DevHelpers.checkEnvironmentSetup()');
+  }
 });
 
 // Export for module usage

@@ -1,7 +1,8 @@
 // src/utils/airtable/client.js
-// Airtable API client with error handling and caching
+// Airtable API client with smart field mapping and error handling
 
 import { APP_CONFIG, getApiUrl, getErrorMessage } from '../../config/app.config.js';
+import { SmartFieldMapper } from './smart-field-mapper.js';
 
 class AirtableClient {
   constructor() {
@@ -16,6 +17,10 @@ class AirtableClient {
     
     // Cache for API responses
     this.cache = new Map();
+    
+    // Smart field mapper
+    this.fieldMapper = new SmartFieldMapper();
+    this.fieldMappings = null;
     
     // Validate configuration
     this.validateConfig();
@@ -38,6 +43,15 @@ class AirtableClient {
     if (!this.baseId.startsWith('app')) {
       console.warn('Airtable base ID should start with "app"');
     }
+  }
+
+  // Initialize field mappings (call this before first data fetch)
+  async initializeFieldMappings(force = false) {
+    if (!this.fieldMappings || force) {
+      this.fieldMappings = await this.fieldMapper.getFieldMappings(this, force);
+      console.log('🎯 Field mappings initialized:', this.fieldMappings);
+    }
+    return this.fieldMappings;
   }
 
   // Rate-limited request wrapper
@@ -129,7 +143,7 @@ class AirtableClient {
       case 404:
         throw new Error(getErrorMessage('airtable', 'notFound'));
       case 422:
-        throw new Error('Invalid request format');
+        throw new Error('Invalid request format - this usually means field names don\'t match your Airtable table');
       case 429:
         if (retries < maxRetries) {
           const retryAfter = response.headers.get('Retry-After') || 5;
@@ -144,8 +158,13 @@ class AirtableClient {
     }
   }
 
-  // Fetch all products with pagination
+  // Fetch products with smart field mapping
   async getProducts(options = {}) {
+    // Initialize field mappings if not done yet
+    if (!this.fieldMappings) {
+      await this.initializeFieldMappings();
+    }
+
     const cacheKey = `products_${JSON.stringify(options)}`;
     
     // Check cache first
@@ -158,26 +177,7 @@ class AirtableClient {
     }
 
     try {
-      const allRecords = [];
-      let offset = options.offset;
-
-      do {
-        const params = new URLSearchParams({
-          maxRecords: options.maxRecords || 100,
-          view: options.view || 'Grid view',
-          ...options.filterByFormula && { filterByFormula: options.filterByFormula },
-          ...options.sort && { sort: JSON.stringify(options.sort) },
-          ...offset && { offset }
-        });
-
-        const url = getApiUrl(`/${this.baseId}/${this.tableName}?${params}`);
-        const response = await this.makeRequest(url);
-        
-        allRecords.push(...response.records);
-        offset = response.offset;
-        
-      } while (offset);
-
+      const allRecords = await this.fetchAllRecords(options);
       const transformedData = this.transformProductData(allRecords);
       
       // Cache the results
@@ -193,45 +193,122 @@ class AirtableClient {
       
     } catch (error) {
       console.error('Error fetching products:', error);
+      
+      // Try fallback approach if smart query fails
+      if (error.message.includes('field names')) {
+        console.log('🔄 Smart query failed, trying fallback approach...');
+        return await this.getProductsFallback(options);
+      }
+      
       throw error;
     }
   }
 
-  // Fetch single product by ID
-  async getProduct(recordId) {
-    const cacheKey = `product_${recordId}`;
-    
-    if (this.cache.has(cacheKey)) {
-      const cached = this.cache.get(cacheKey);
-      if (Date.now() - cached.timestamp < APP_CONFIG.cache.airtableData.ttl) {
-        return cached.data;
-      }
+  // Fetch all records with pagination using smart queries
+  async fetchAllRecords(options = {}) {
+    let allRecords = [];
+    let offset = options.offset;
+
+    // Try smart query first
+    try {
+      const smartQuery = this.buildSmartQuery(options);
+      
+      do {
+        const params = new URLSearchParams({
+          maxRecords: options.maxRecords || 100,
+          ...smartQuery,
+          ...offset && { offset }
+        });
+
+        const url = getApiUrl(`/${this.baseId}/${this.tableName}?${params}`);
+        const response = await this.makeRequest(url);
+        
+        allRecords.push(...response.records);
+        offset = response.offset;
+        
+      } while (offset);
+
+      return allRecords;
+      
+    } catch (error) {
+      // If smart query fails, try simple approach
+      console.warn('Smart query failed, falling back to simple fetch:', error);
+      return await this.fetchRecordsSimple(options);
+    }
+  }
+
+  // Build query using smart field mappings
+  buildSmartQuery(options = {}) {
+    if (!this.fieldMappings) {
+      return {}; // Return empty query if mappings not available
     }
 
+    // Determine query type based on options
+    const queryType = options.includeInactive ? 'allProducts' : 'activeProducts';
+    
     try {
-      const url = getApiUrl(`/${this.baseId}/${this.tableName}/${recordId}`);
-      const response = await this.makeRequest(url);
-      const transformedData = this.transformProductRecord(response);
-      
-      this.cache.set(cacheKey, {
-        data: transformedData,
-        timestamp: Date.now()
+      return this.fieldMapper.buildQuery(this.fieldMappings, queryType, options);
+    } catch (error) {
+      console.warn('Failed to build smart query:', error);
+      return {}; // Return empty query as fallback
+    }
+  }
+
+  // Simple fallback fetch without field-specific queries
+  async fetchRecordsSimple(options = {}) {
+    let allRecords = [];
+    let offset = options.offset;
+
+    do {
+      const params = new URLSearchParams({
+        maxRecords: options.maxRecords || 100,
+        ...offset && { offset }
       });
 
+      const url = getApiUrl(`/${this.baseId}/${this.tableName}?${params}`);
+      const response = await this.makeRequest(url);
+      
+      allRecords.push(...response.records);
+      offset = response.offset;
+      
+    } while (offset);
+
+    return allRecords;
+  }
+
+  // Fallback method when smart mapping fails
+  async getProductsFallback(options = {}) {
+    console.log('📦 Using fallback product fetch...');
+    
+    try {
+      const allRecords = await this.fetchRecordsSimple(options);
+      const transformedData = this.transformProductDataFallback(allRecords);
+      
       return transformedData;
       
     } catch (error) {
-      console.error('Error fetching product:', error);
+      console.error('Fallback fetch also failed:', error);
       throw error;
     }
   }
 
-  // Transform raw Airtable data to application format
+  // Transform product data using smart mapping
   transformProductData(records) {
-    return records.map(record => this.transformProductRecord(record));
+    if (!this.fieldMappings) {
+      return this.transformProductDataFallback(records);
+    }
+
+    return records.map(record => 
+      this.fieldMapper.transformRecord(record, this.fieldMappings)
+    );
   }
 
-  transformProductRecord(record) {
+  // Fallback transformation without smart mapping
+  transformProductDataFallback(records) {
+    return records.map(record => this.transformProductRecordFallback(record));
+  }
+
+  transformProductRecordFallback(record) {
     const fields = record.fields;
     
     return {
@@ -244,12 +321,13 @@ class AirtableClient {
       variations: fields['Notes'] || fields['Variations'] || '',
       images: this.transformImages(fields['Photos'] || fields['Images'] || []),
       category: fields['Category'] || 'Uncategorized',
-      active: fields['Line_Sheet'] !== false && fields['Active'] !== false, // Include if Line_Sheet is checked or Active is true
+      active: fields['Line_Sheet'] !== false && fields['Active'] !== false,
       status: fields['Status'] || '',
       lastModified: record.createdTime,
       metadata: {
         airtableId: record.id,
-        createdTime: record.createdTime
+        createdTime: record.createdTime,
+        usingFallback: true
       }
     };
   }
@@ -267,6 +345,41 @@ class AirtableClient {
     }));
   }
 
+  // Fetch single product by ID
+  async getProduct(recordId) {
+    const cacheKey = `product_${recordId}`;
+    
+    if (this.cache.has(cacheKey)) {
+      const cached = this.cache.get(cacheKey);
+      if (Date.now() - cached.timestamp < APP_CONFIG.cache.airtableData.ttl) {
+        return cached.data;
+      }
+    }
+
+    try {
+      const url = getApiUrl(`/${this.baseId}/${this.tableName}/${recordId}`);
+      const response = await this.makeRequest(url);
+      
+      let transformedData;
+      if (this.fieldMappings) {
+        transformedData = this.fieldMapper.transformRecord(response, this.fieldMappings);
+      } else {
+        transformedData = this.transformProductRecordFallback(response);
+      }
+      
+      this.cache.set(cacheKey, {
+        data: transformedData,
+        timestamp: Date.now()
+      });
+
+      return transformedData;
+      
+    } catch (error) {
+      console.error('Error fetching product:', error);
+      throw error;
+    }
+  }
+
   // Test connection to Airtable
   async testConnection() {
     try {
@@ -278,22 +391,20 @@ class AirtableClient {
     }
   }
 
-  // Get table schema
-  async getTableSchema() {
-    try {
-      const url = getApiUrl(`/meta/bases/${this.baseId}/tables`);
-      const response = await this.makeRequest(url);
-      
-      const table = response.tables.find(t => t.name === this.tableName);
-      if (!table) {
-        throw new Error(`Table "${this.tableName}" not found in base`);
-      }
-      
-      return table.fields;
-    } catch (error) {
-      console.error('Error fetching table schema:', error);
-      throw error;
-    }
+  // Get field mapping information
+  getFieldMappings() {
+    return this.fieldMappings;
+  }
+
+  getMappingStats() {
+    if (!this.fieldMappings) return null;
+    return this.fieldMapper.getMappingStats(this.fieldMappings);
+  }
+
+  // Force refresh field mappings
+  async refreshFieldMappings() {
+    await this.initializeFieldMappings(true);
+    return this.fieldMappings;
   }
 
   // Utility methods
@@ -304,7 +415,6 @@ class AirtableClient {
   cleanupCache() {
     if (this.cache.size <= APP_CONFIG.cache.airtableData.maxSize) return;
     
-    // Remove oldest entries
     const entries = Array.from(this.cache.entries());
     entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
     
@@ -314,14 +424,15 @@ class AirtableClient {
 
   clearCache() {
     this.cache.clear();
+    this.fieldMapper.clearCache();
   }
 
-  // Get cache statistics
   getCacheStats() {
     return {
       size: this.cache.size,
       maxSize: APP_CONFIG.cache.airtableData.maxSize,
-      entries: Array.from(this.cache.keys())
+      entries: Array.from(this.cache.keys()),
+      fieldMappings: this.fieldMappings ? Object.keys(this.fieldMappings) : null
     };
   }
 }

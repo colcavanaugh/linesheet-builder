@@ -17,9 +17,9 @@
 ### 1.1 Project Initialization (Days 1-2)
 - [X] Run project setup script
 - [X] Initialize Git repository
-- [ ] Set up development environment
-- [ ] Install and configure all dependencies
-- [ ] Create initial file structure
+- [X] Set up development environment
+- [X] Install and configure all dependencies
+- [X] Create initial file structure
 
 **Deliverable:** Working development environment with hot reload
 

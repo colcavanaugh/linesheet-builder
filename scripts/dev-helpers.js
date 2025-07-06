@@ -18,7 +18,7 @@ export const SAMPLE_PRODUCTS = [
     'Notes': 'Sizes 5-10 available',
     'Photos': [],
     'Status': 'Active'
-},
+  },
   {
     'SKU': 'N002',
     'Name': 'Gold Chain Necklace',
@@ -151,13 +151,66 @@ export class DevHelpers {
       console.log('   VITE_AIRTABLE_ACCESS_TOKEN=your_personal_access_token_here');
       console.log('   VITE_AIRTABLE_BASE_ID=your_base_id_here');
       console.log('   VITE_AIRTABLE_TABLE_NAME=Products');
-      console.log('\n📋 For your specific setup:');
-      console.log('   VITE_AIRTABLE_ACCESS_TOKEN=patV2fXNB9gjkpy3g.34b36f91128ffefb9d292709a54b65cdc30c53c85714bf514cbdaa7612496a27');
-      console.log('   VITE_AIRTABLE_BASE_ID=appmDNXTcMaDH4rPF');
-      console.log('   VITE_AIRTABLE_TABLE_NAME=Products');
     }
 
     return allGood;
+  }
+
+  static async testFieldMapping() {
+    console.log('🔍 Testing Smart Field Mapping...');
+    
+    try {
+      // Test field discovery
+      const mappings = await AirtableClient.refreshFieldMappings();
+      console.log('✅ Field mappings discovered:', mappings);
+      
+      // Show mapping statistics
+      const stats = AirtableClient.getMappingStats();
+      console.log('📊 Mapping Statistics:', stats);
+      
+      // Test if all required fields are mapped
+      const requiredFields = ['productCode', 'productName', 'wholesalePrice'];
+      const missingFields = requiredFields.filter(field => 
+        !mappings[field] || mappings[field].confidence === 'missing'
+      );
+      
+      if (missingFields.length > 0) {
+        console.warn('⚠️ Missing required fields:', missingFields);
+      } else {
+        console.log('✅ All required fields successfully mapped');
+      }
+      
+      return mappings;
+      
+    } catch (error) {
+      console.log('❌ Field mapping test failed:', error.message);
+      return null;
+    }
+  }
+
+  static async testSmartQuery() {
+    console.log('🧠 Testing Smart Query Building...');
+    
+    try {
+      // Test loading products with smart queries
+      console.time('smart-query-time');
+      const products = await AirtableClient.getProducts();
+      console.timeEnd('smart-query-time');
+      
+      console.log(`✅ Smart query successful: loaded ${products.length} products`);
+      
+      // Check if any products are using fallback transformation
+      const fallbackProducts = products.filter(p => p.metadata?.usingFallback);
+      if (fallbackProducts.length > 0) {
+        console.warn(`⚠️ ${fallbackProducts.length} products using fallback transformation`);
+      }
+      
+      return products;
+      
+    } catch (error) {
+      console.log('❌ Smart query test failed:', error.message);
+      return [];
+    }
   }
 
   static async runFullTest() {
@@ -185,13 +238,34 @@ export class DevHelpers {
     const products = await this.loadTestData();
     console.log('');
 
-    // 4. Test validation with sample data
+    // 4. Test smart field mapping
+    console.log('🧠 Testing smart field mapping...');
+    const mappings = await this.testFieldMapping();
+    if (mappings) {
+      console.log('✅ Smart field mapping working');
+    }
+    console.log('');
+
+    // 5. Test smart queries
+    console.log('🔍 Testing smart query system...');
+    const smartProducts = await this.testSmartQuery();
+    console.log(`✅ Smart queries: ${smartProducts.length} products loaded`);
+    console.log('');
+
+    // 6. Test validation with sample data
     console.log('🧪 Testing validation with sample data...');
     const sampleValidation = AirtableValidator.validateProductData(SAMPLE_PRODUCTS);
     console.log(`✅ Sample data validation: ${sampleValidation.summary.validCount}/${sampleValidation.summary.total} valid`);
     console.log('');
 
-    // 5. Test caching
+    // 7. Test line sheet organization
+    console.log('📋 Testing line sheet organization...');
+    const organized = LineSheetOrganizer.organizeGiltyBoyProducts(products);
+    console.log(`✅ Organized into ${organized.summary.totalCategories} categories`);
+    console.log(`📊 Line sheet summary:`, organized.summary);
+    console.log('');
+
+    // 8. Test caching
     console.log('💾 Testing cache functionality...');
     const cacheStatsBefore = AirtableClient.getCacheStats();
     await AirtableClient.getProducts(); // Should hit cache
@@ -200,7 +274,7 @@ export class DevHelpers {
     console.log('');
 
     console.log('🎉 All tests completed successfully!');
-    console.log(`📊 Summary: ${products.length} products loaded and validated`);
+    console.log(`📊 Summary: ${products.length} products loaded with smart mapping`);
     
     return true;
   }
@@ -306,7 +380,7 @@ export class DevHelpers {
           console.log(`    ${material}: ${materialProducts.length} items`);
           
           materialProducts.forEach(product => {
-            console.log(`      ${product.productCode} - ${product.productName} (${product.wholesalePrice})`);
+            console.log(`      ${product.productCode} - ${product.productName} ($${product.wholesalePrice})`);
           });
         });
       });
@@ -315,10 +389,10 @@ export class DevHelpers {
       console.log('💰 Price Analysis:');
       const prices = activeProducts.map(p => p.wholesalePrice).filter(p => p > 0);
       if (prices.length > 0) {
-        console.log(`  Min: ${Math.min(...prices)}`);
-        console.log(`  Max: ${Math.max(...prices)}`);
-        console.log(`  Average: ${(prices.reduce((a, b) => a + b, 0) / prices.length).toFixed(2)}`);
-        console.log(`  Total Value: ${organized.summary.totalWholesaleValue.toFixed(2)}`);
+        console.log(`  Min: $${Math.min(...prices)}`);
+        console.log(`  Max: $${Math.max(...prices)}`);
+        console.log(`  Average: $${(prices.reduce((a, b) => a + b, 0) / prices.length).toFixed(2)}`);
+        console.log(`  Total Value: $${organized.summary.totalWholesaleValue.toFixed(2)}`);
       }
       
       console.log('');
@@ -337,6 +411,26 @@ export class DevHelpers {
       console.log('❌ Error testing Gilty Boy data:', error.message);
       return false;
     }
+  }
+
+  static logDebugInfo() {
+    console.log('🐛 Debug Information:');
+    console.log('');
+    console.log('Environment:', import.meta.env.MODE);
+    console.log('Cache Stats:', AirtableClient.getCacheStats());
+    console.log('Field Mappings:', AirtableClient.getFieldMappings());
+    console.log('Mapping Stats:', AirtableClient.getMappingStats());
+    console.log('');
+    console.log('Available Commands:');
+    console.log('  DevHelpers.testAirtableConnection()');
+    console.log('  DevHelpers.loadTestData()');
+    console.log('  DevHelpers.testGiltyBoyData()');
+    console.log('  DevHelpers.testFieldMapping()');
+    console.log('  DevHelpers.testSmartQuery()');
+    console.log('  DevHelpers.checkEnvironmentSetup()');
+    console.log('  DevHelpers.runFullTest()');
+    console.log('  DevHelpers.benchmarkPerformance()');
+    console.log('  DevHelpers.generateSampleAirtableStructure()');
   }
 }
 

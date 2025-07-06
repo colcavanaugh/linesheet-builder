@@ -68,9 +68,6 @@ git status
 
 # Check if environment file exists
 ls -la .env
-
-# Verify Airtable credentials are set
-echo $VITE_AIRTABLE_ACCESS_TOKEN | head -c 10
 ```
 
 ### Environment Setup
@@ -86,8 +83,8 @@ cd ~/path/to/gilty-boy/linesheet-builder
 cat .env
 
 # Expected contents:
-# VITE_AIRTABLE_ACCESS_TOKEN=patV2fXNB9gjkpy3g.34b36f91128ffefb9d292709a54b65cdc30c53c85714bf514cbdaa7612496a27
-# VITE_AIRTABLE_BASE_ID=appmDNXTcMaDH4rPF
+# VITE_AIRTABLE_ACCESS_TOKEN=your_pat_token_here
+# VITE_AIRTABLE_BASE_ID=your_base_id_here
 # VITE_AIRTABLE_TABLE_NAME=Products
 # NODE_ENV=development
 ```

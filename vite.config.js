@@ -3,6 +3,7 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   root: 'src',
   publicDir: '../public',
+  envDir: '../', // Tell Vite to look for .env files in the project root
   build: {
     outDir: '../dist',
     emptyOutDir: true,
