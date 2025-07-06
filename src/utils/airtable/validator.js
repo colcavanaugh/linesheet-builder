@@ -153,44 +153,55 @@ export class AirtableValidator {
     ];
   }
 
-  // Field-specific validation
+  // Field-specific validation - UPDATED to match standardized field names
   validateField(fieldName, value) {
     const errors = [];
     const warnings = [];
 
     switch (fieldName) {
+      // UPDATED: Use standardized field names
+      case 'productCode':
       case 'SKU':
       case 'Product Code':
         return this.validateProductCode(value);
       
+      case 'productName':
       case 'Name':
       case 'Product Name':
         return this.validateProductName(value);
       
+      case 'wholesalePrice':
+      case 'retailPrice':
       case 'Wholesale_Price':
       case 'Wholesale Price':
       case 'Retail_Price':
       case 'Retail Price':
         return this.validatePrice(value, fieldName);
       
+      case 'material':
       case 'Material':
         return this.validateMaterial(value);
       
+      case 'category':
       case 'Category':
         return this.validateCategory(value);
       
+      case 'images':
       case 'Photos':
       case 'Images':
         return this.validateImages(value);
       
+      case 'variations':
       case 'Notes':
       case 'Variations':
         return this.validateVariations(value);
       
+      case 'active':
       case 'Line_Sheet':
       case 'Active':
         return this.validateActive(value);
       
+      case 'status':
       case 'Status':
         return this.validateStatus(value);
       

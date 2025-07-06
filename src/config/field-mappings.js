@@ -114,7 +114,8 @@ export const FIELD_PATTERNS = {
 // Configuration for query building
 export const QUERY_CONFIG = {
   activeProducts: {
-    filterTemplate: (activeField) => `AND({${activeField}} = TRUE())`,
+    // FIXED: Changed TRUE() to TRUE - Airtable API doesn't use function syntax for boolean values
+    filterTemplate: (activeField) => `AND({${activeField}} = TRUE)`,
     sortTemplate: (codeField) => [{ field: codeField, direction: 'asc' }]
   },
   

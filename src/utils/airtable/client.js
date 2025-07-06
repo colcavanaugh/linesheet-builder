@@ -206,7 +206,7 @@ class AirtableClient {
 
   // Fetch all records with pagination using smart queries
   async fetchAllRecords(options = {}) {
-    let allRecords = [];
+    const allRecords = [];
     let offset = options.offset;
 
     // Try smart query first
@@ -256,7 +256,7 @@ class AirtableClient {
 
   // Simple fallback fetch without field-specific queries
   async fetchRecordsSimple(options = {}) {
-    let allRecords = [];
+    const allRecords = [];
     let offset = options.offset;
 
     do {

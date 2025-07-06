@@ -89,8 +89,9 @@ export const APP_CONFIG = {
   // Data validation rules
   validation: {
     product: {
-      requiredFields: ['SKU', 'Name', 'Wholesale_Price'],
-      optionalFields: ['Material', 'Retail_Price', 'Notes', 'Photos', 'Category', 'Line_Sheet', 'Status'],
+      // FIXED: Use standardized field names that match the smart field mapper output
+      requiredFields: ['productCode', 'productName', 'wholesalePrice'],
+      optionalFields: ['material', 'retailPrice', 'variations', 'images', 'category', 'active', 'status'],
       imageFormats: ['jpg', 'jpeg', 'png', 'webp'],
       maxImageSize: 5 * 1024 * 1024 // 5MB
     }
