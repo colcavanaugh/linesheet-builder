@@ -1,10 +1,30 @@
 # Source Code Documentation Standards
 
+## Table of Contents
+
+- [Overview](#overview)
+- [JavaScript Documentation](#javascript-documentation)
+  - [Documentation Tool](#documentation-tool)
+  - [File Structure Documentation](#file-structure-documentation)
+  - [Function Documentation](#function-documentation)
+  - [Class Documentation](#class-documentation)
+  - [Method Documentation](#method-documentation)
+  - [Special Documentation Tags](#special-documentation-tags)
+  - [Code Examples in Documentation](#code-examples-in-documentation)
+  - [Error Documentation](#error-documentation)
+  - [Constants and Configuration](#constants-and-configuration)
+- [HTML Documentation](#html-documentation)
+- [CSS Documentation](#css-documentation)
+- [Configuration File Documentation](#configuration-file-documentation)
+- [Documentation Quality Standards](#documentation-quality-standards)
+- [Maintenance Guidelines](#maintenance-guidelines)
+- [Integration with Development Workflow](#integration-with-development-workflow)
+
 ## Overview
 
-This document establishes the standards and conventions for documenting JavaScript source code in the Gilty Boy Line Sheet Builder project. All JavaScript files should follow these guidelines to ensure maintainability, readability, and ease of onboarding for future developers.
+This document establishes the standards and conventions for documenting source code in the Gilty Boy Line Sheet Builder project. While the project is primarily JavaScript-based, this guide covers documentation approaches for all file types used in the project to ensure maintainability, readability, and ease of onboarding for future developers.
 
-## Documentation Tool
+## JavaScript Documentation
 
 We use **JSDoc** as our primary documentation standard. JSDoc is the most widely adopted JavaScript documentation tool and integrates well with modern IDEs and development workflows.
 
@@ -16,9 +36,9 @@ We use **JSDoc** as our primary documentation standard. JSDoc is the most widely
 - **Auto-Generation**: Can generate HTML documentation automatically
 - **Tooling**: Works seamlessly with ESLint, TypeScript, and other tools
 
-## File Structure Documentation
+### File Structure Documentation
 
-### File Header
+#### File Header
 Every JavaScript file should begin with a comprehensive header comment:
 
 ```javascript
@@ -35,7 +55,7 @@ Every JavaScript file should begin with a comprehensive header comment:
  */
 ```
 
-### Import/Export Documentation
+#### Import/Export Documentation
 Document imports and exports to clarify dependencies:
 
 ```javascript
@@ -52,9 +72,9 @@ import { formatPrice, sanitizeString } from './helpers.js';
  */
 ```
 
-## Function Documentation
+### Function Documentation
 
-### Function Header Structure
+#### Function Header Structure
 Every function should include comprehensive JSDoc comments:
 
 ```javascript
@@ -89,7 +109,7 @@ Every function should include comprehensive JSDoc comments:
  */
 ```
 
-### Parameter Types
+#### Parameter Types
 Use specific, descriptive types:
 
 ```javascript
@@ -106,9 +126,9 @@ Use specific, descriptive types:
  */
 ```
 
-## Class Documentation
+### Class Documentation
 
-### Class Header
+#### Class Header
 Classes require comprehensive documentation:
 
 ```javascript
@@ -147,7 +167,7 @@ class ClassName {
 }
 ```
 
-### Property Documentation
+#### Property Documentation
 Document important class properties:
 
 ```javascript
@@ -165,9 +185,9 @@ class ClassName {
 }
 ```
 
-## Method Documentation
+### Method Documentation
 
-### Public Methods
+#### Public Methods
 All public methods require full documentation:
 
 ```javascript
@@ -206,7 +226,7 @@ async getProducts(criteria = {}, options = {}) {
 }
 ```
 
-### Private Methods
+#### Private Methods
 Private methods need basic documentation:
 
 ```javascript
@@ -222,9 +242,9 @@ _validateResponse(response) {
 }
 ```
 
-## Special Documentation Tags
+### Special Documentation Tags
 
-### Important Tags to Use
+#### Important Tags to Use
 
 - `@deprecated` - Mark deprecated functions with replacement info
 - `@todo` - Note planned improvements or fixes needed
@@ -234,7 +254,7 @@ _validateResponse(response) {
 - `@since` - Version when feature was added
 - `@version` - Current version of the function/class
 
-### Custom Tags for This Project
+#### Custom Tags for This Project
 
 ```javascript
 /**
@@ -246,9 +266,9 @@ _validateResponse(response) {
  */
 ```
 
-## Code Examples in Documentation
+### Code Examples in Documentation
 
-### Example Standards
+#### Example Standards
 - Include realistic, working examples
 - Show both basic and advanced usage
 - Demonstrate error handling when relevant
@@ -277,9 +297,9 @@ _validateResponse(response) {
  */
 ```
 
-## Error Documentation
+### Error Documentation
 
-### Error Handling
+#### Error Handling
 Document all error conditions:
 
 ```javascript
@@ -291,9 +311,9 @@ Document all error conditions:
  */
 ```
 
-## Constants and Configuration
+### Constants and Configuration
 
-### Document Constants
+#### Document Constants
 ```javascript
 /**
  * Default configuration for Airtable client
@@ -306,6 +326,359 @@ const AIRTABLE_DEFAULTS = {
   CACHE_DURATION: 5 * 60 * 1000,
   MAX_RECORDS: 100,
   DEFAULT_VIEW: 'Line Sheet View'
+};
+```
+
+## HTML Documentation
+
+### File Structure Comments
+HTML files should include clear section comments and metadata:
+
+```html
+<!DOCTYPE html>
+<!--
+  Gilty Boy Line Sheet Builder - Main Application Interface
+  
+  This file provides the primary user interface for the line sheet builder
+  application. It includes sections for connection setup, product display,
+  customization options, and export controls.
+  
+  Key sections:
+  - Connection setup and status
+  - Product grid and filtering
+  - Line sheet customization
+  - Export and download controls
+  
+  @author Gilty Boy Line Sheet Builder
+  @version 1.0.0
+  @since 2025-01-01
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gilty Boy Line Sheet Builder</title>
+  
+  <!-- Application Styles -->
+  <link rel="stylesheet" href="styles/main.css">
+  <!-- Custom Fonts for Brand Consistency -->
+  <link rel="stylesheet" href="styles/fonts.css">
+</head>
+<body>
+  <!-- Main Application Container -->
+  <div id="app" class="min-h-screen bg-gray-50">
+    
+    <!-- Header Section: Branding and Navigation -->
+    <header class="bg-white shadow-sm border-b">
+      <!-- Header content -->
+    </header>
+    
+    <!-- Main Content: Connection and Product Management -->
+    <main class="container mx-auto px-4 py-8">
+      
+      <!-- Connection Setup Section -->
+      <section id="connection-section" class="mb-8">
+        <!-- Connection form and status -->
+      </section>
+      
+      <!-- Product Display Section -->
+      <section id="products-section" class="mb-8">
+        <!-- Product grid and controls -->
+      </section>
+      
+      <!-- Customization Section -->
+      <section id="customization-section" class="mb-8">
+        <!-- Template and styling options -->
+      </section>
+      
+      <!-- Export Section -->
+      <section id="export-section">
+        <!-- Export controls and download buttons -->
+      </section>
+      
+    </main>
+    
+  </div>
+  
+  <!-- Application JavaScript -->
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
+```
+
+### Semantic HTML Documentation
+- Use semantic HTML5 elements (`<header>`, `<main>`, `<section>`, `<article>`)
+- Include ARIA labels for accessibility
+- Document complex form structures
+- Comment dynamic content areas
+
+### Accessibility Documentation
+```html
+<!-- 
+  Accessibility Features:
+  - ARIA labels for screen readers
+  - Keyboard navigation support
+  - High contrast color scheme
+  - Focus management for dynamic content
+-->
+<button 
+  type="button" 
+  id="connect-btn"
+  aria-describedby="connection-help"
+  class="btn btn-primary">
+  Connect to Airtable
+</button>
+<div id="connection-help" class="sr-only">
+  This button will test your Airtable connection using the provided credentials
+</div>
+```
+
+## CSS Documentation
+
+### File Header Documentation
+```css
+/**
+ * Main Application Styles
+ * 
+ * This file contains the core styling for the Gilty Boy Line Sheet Builder
+ * application. It includes base styles, component styles, utility classes,
+ * and print-specific styling for line sheet generation.
+ * 
+ * Structure:
+ * 1. CSS Variables and Design Tokens
+ * 2. Base Styles and Typography
+ * 3. Layout Components
+ * 4. UI Components
+ * 5. Print Styles
+ * 6. Responsive Design
+ * 
+ * @author Gilty Boy Line Sheet Builder
+ * @version 1.0.0
+ * @since 2025-01-01
+ */
+
+/* ===== CSS VARIABLES AND DESIGN TOKENS ===== */
+:root {
+  /* Brand Colors */
+  --color-primary: #8b4513;      /* Gilty Boy brand brown */
+  --color-secondary: #d4af37;    /* Gold accent */
+  --color-accent: #f5f5dc;       /* Beige background */
+  
+  /* Typography */
+  --font-primary: 'Playfair Display', serif;  /* Brand headers */
+  --font-secondary: 'Inter', sans-serif;      /* Body text */
+  
+  /* Spacing Scale */
+  --space-xs: 0.25rem;    /* 4px */
+  --space-sm: 0.5rem;     /* 8px */
+  --space-md: 1rem;       /* 16px */
+  --space-lg: 2rem;       /* 32px */
+  --space-xl: 4rem;       /* 64px */
+}
+```
+
+### Component Documentation
+```css
+/**
+ * Product Card Component
+ * 
+ * Displays individual product information in a card format.
+ * Includes product image, name, pricing, and material details.
+ * 
+ * Usage:
+ * <div class="product-card">
+ *   <div class="product-card__image">...</div>
+ *   <div class="product-card__content">...</div>
+ * </div>
+ * 
+ * Modifiers:
+ * .product-card--featured  - Larger size for featured products
+ * .product-card--compact   - Smaller size for dense layouts
+ */
+.product-card {
+  /* Base card styles */
+  background: white;
+  border-radius: var(--space-sm);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+.product-card:hover {
+  /* Hover state for interactivity */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.product-card__image {
+  /* Product image container */
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: var(--color-accent);
+}
+
+.product-card__content {
+  /* Product details area */
+  padding: var(--space-md);
+}
+```
+
+### Print Styles Documentation
+```css
+/**
+ * Print Styles for Line Sheet Generation
+ * 
+ * These styles are applied when generating PDF line sheets.
+ * They ensure proper formatting, spacing, and layout for
+ * professional wholesale catalogs.
+ * 
+ * Print Requirements:
+ * - High contrast for readability
+ * - Proper page breaks
+ * - Consistent spacing
+ * - Professional typography
+ */
+@media print {
+  /* Remove interactive elements for print */
+  .no-print,
+  button,
+  .btn {
+    display: none !important;
+  }
+  
+  /* Ensure proper page formatting */
+  @page {
+    margin: 1in;
+    size: letter;
+  }
+  
+  /* Control page breaks */
+  .product-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  
+  /* High contrast for print */
+  body {
+    color: #000;
+    background: #fff;
+  }
+}
+```
+
+### Responsive Design Documentation
+```css
+/**
+ * Responsive Breakpoints
+ * 
+ * Mobile-first approach with progressive enhancement
+ * 
+ * Breakpoints:
+ * - sm: 640px   (tablet portrait)
+ * - md: 768px   (tablet landscape)
+ * - lg: 1024px  (desktop)
+ * - xl: 1280px  (large desktop)
+ */
+ 
+/* Mobile styles (default) */
+.product-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+}
+
+/* Tablet and up */
+@media (min-width: 640px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Desktop and up */
+@media (min-width: 1024px) {
+  .product-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+```
+
+## Configuration File Documentation
+
+### Environment Configuration
+```javascript
+// config/development/.env.development
+/**
+ * Development Environment Configuration
+ * 
+ * This file contains environment-specific settings for the development
+ * environment. These values are used during local development and testing.
+ * 
+ * SECURITY NOTE: This file should contain only non-sensitive configuration.
+ * Actual API keys and tokens should be stored in .env.local (gitignored).
+ * 
+ * @author Gilty Boy Line Sheet Builder
+ * @version 1.0.0
+ * @since 2025-01-01
+ */
+
+# Airtable Configuration
+# These are template values - replace with your actual credentials
+VITE_AIRTABLE_ACCESS_TOKEN=your_pat_token_here
+VITE_AIRTABLE_BASE_ID=your_base_id_here
+VITE_AIRTABLE_TABLE_NAME=Products
+
+# Application Settings
+NODE_ENV=development
+VITE_APP_NAME=Gilty Boy Line Sheet Builder
+VITE_APP_VERSION=1.0.0
+
+# Development Features
+VITE_ENABLE_DEBUG=true
+VITE_ENABLE_MOCK_DATA=false
+```
+
+### JavaScript Configuration Files
+```javascript
+/**
+ * @fileoverview Application configuration constants and settings
+ * 
+ * This file contains all configuration values used throughout the application.
+ * It provides centralized configuration management and type definitions for
+ * all settings that control application behavior.
+ * 
+ * @author Gilty Boy Line Sheet Builder
+ * @version 1.0.0
+ * @since 2025-01-01
+ * @module AppConfig
+ */
+
+/**
+ * Core application configuration object
+ * @constant {Object}
+ */
+export const APP_CONFIG = {
+  /**
+   * Application metadata
+   * @property {Object} app
+   */
+  app: {
+    name: 'Gilty Boy Line Sheet Builder',
+    version: '1.0.0',
+    description: 'Professional wholesale catalog generator'
+  },
+  
+  /**
+   * Data validation rules
+   * @property {Object} validation
+   */
+  validation: {
+    product: {
+      requiredFields: ['productCode', 'name', 'wholesalePrice'],
+      optionalFields: ['material', 'category', 'retailPrice', 'notes'],
+      imageFormats: ['jpg', 'jpeg', 'png', 'webp'],
+      maxImageSize: 5 * 1024 * 1024 // 5MB
+    }
+  }
 };
 ```
 
