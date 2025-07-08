@@ -166,7 +166,7 @@ class LineSheetApp {
     
     try {
       const products = await this.airtableClient.getProducts({
-        filterByFormula: 'AND({Active} = TRUE())', // Only fetch active products
+        filterByFormula: '{Active} = TRUE', // Only fetch active products
         sort: [{ field: 'Product Code', direction: 'asc' }]
       });
 

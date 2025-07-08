@@ -102,3 +102,4 @@ temp/
 # Generated line sheets
 exports/
 output/
+config/development/.env.development
