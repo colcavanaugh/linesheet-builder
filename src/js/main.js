@@ -165,44 +165,24 @@ class LineSheetApp {
     this.updateLoadingState(true, 'Fetching product data...');
     
     try {
-      // FIX: Use smart field mapper instead of hardcoded field names
-      // This will automatically use the correct field mappings discovered by your smart mapper
-      const products = await this.airtableClient.getProducts({
-        // Remove the hardcoded options - let the smart mapper handle filtering and sorting
-        // The smart mapper will automatically:
-        // - Use 'Line_Sheet' field for filtering active products
-        // - Use 'SKU' field for sorting 
-        // - Apply correct boolean syntax ({Line_Sheet} = 1)
-        // - Use proper sort format (sort[0][field]=SKU&sort[0][direction]=asc)
-      });
+      // SIMPLIFIED: Just ask for active products, let the smart mapper handle everything
+      const products = await this.airtableClient.getActiveProducts();
 
-      // Validate products
+      // The rest remains the same - validation, organization, UI updates
       const validationResults = this.validator.validateProductData(products);
-      
-      if (validationResults.summary.invalidCount > 0) {
-        console.warn('Some products have validation issues:', validationResults.invalid);
-        this.showWarning(`${validationResults.summary.invalidCount} products have validation issues. Check console for details.`);
-      }
-
-      // Store valid products
       this.state.products = validationResults.valid.map(item => item.product);
-      
-      // Organize products for line sheet
       this.state.organizedProducts = LineSheetOrganizer.organizeGiltyBoyProducts(this.state.products);
       
       this.updateProductCount(this.state.products.length);
       this.updateLineSheetStats(this.state.organizedProducts);
       this.renderProductGrid();
       
-      console.log(`✅ Loaded ${this.state.products.length} products`);
-      console.log('📊 Line Sheet Organization:', this.state.organizedProducts.summary);
-      
     } catch (error) {
       console.error('Failed to fetch products:', error);
       throw error;
     }
   }
-
+  
   async refreshData() {
     if (!this.hasAirtableCredentials()) {
       this.showError('No Airtable connection configured.');

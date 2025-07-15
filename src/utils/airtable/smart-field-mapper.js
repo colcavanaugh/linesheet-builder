@@ -262,26 +262,31 @@ export class SmartFieldMapper {
   // Transform value based on expected type
   transformValue(value, type, defaultValue) {
     switch (type) {
-      case 'currency':
+      case 'currency': {
         const num = typeof value === 'string' ? parseFloat(value) : value;
         return isNaN(num) ? defaultValue : num;
+      }
       
-      case 'checkbox':
+      case 'checkbox': {
         return Boolean(value);
+      }
       
-      case 'attachment':
+      case 'attachment': {
         return Array.isArray(value) ? this.transformImages(value) : defaultValue;
+      }
       
-      case 'select':
+      case 'select': {
         // Handle single select vs multi-select
         if (Array.isArray(value)) {
           return value.length > 0 ? value[0] : defaultValue;
         }
         return value || defaultValue;
+      }
       
       case 'text':
-      default:
+      default: {
         return String(value || defaultValue);
+      }
     }
   }
 

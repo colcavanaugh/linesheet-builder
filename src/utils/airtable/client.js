@@ -413,6 +413,52 @@ class AirtableClient {
     return this.fieldMappings;
   }
 
+  // High-level convenience methods
+  // These hide the complexity from main.js
+
+  /**
+   * Get only active products (uses smart mapping to determine active field)
+   * @returns {Promise<Array>} Array of active products in standardized format
+   */
+  async getActiveProducts() {
+    return this.getProducts(); // Default behavior already filters for active
+  }
+
+  /**
+   * Get all products regardless of active status
+   * @returns {Promise<Array>} Array of all products in standardized format  
+   */
+  async getAllProducts() {
+    return this.getProducts({ includeInactive: true });
+  }
+
+  /**
+   * Get products by category
+   * @param {string} category - Category to filter by
+   * @returns {Promise<Array>} Array of products in that category
+   */
+  async getProductsByCategory(category) {
+    const products = await this.getActiveProducts();
+    return products.filter(p => p.category === category);
+  }
+
+  /**
+   * Get a summary of available data without fetching all products
+   * @returns {Promise<Object>} Summary of available data
+   */
+  async getDataSummary() {
+    if (!this.fieldMappings) {
+      await this.initializeFieldMappings();
+    }
+    
+    return {
+      fieldMappings: this.fieldMappings,
+      mappingStats: this.getMappingStats(),
+      detectedFields: Object.keys(this.fieldMappings),
+      confidence: this.getMappingStats().confidence
+    };
+  }
+
   // Utility methods
   delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
