@@ -165,9 +165,15 @@ class LineSheetApp {
     this.updateLoadingState(true, 'Fetching product data...');
     
     try {
+      // FIX: Use smart field mapper instead of hardcoded field names
+      // This will automatically use the correct field mappings discovered by your smart mapper
       const products = await this.airtableClient.getProducts({
-        filterByFormula: '{Active} = TRUE', // Only fetch active products
-        sort: [{ field: 'Product Code', direction: 'asc' }]
+        // Remove the hardcoded options - let the smart mapper handle filtering and sorting
+        // The smart mapper will automatically:
+        // - Use 'Line_Sheet' field for filtering active products
+        // - Use 'SKU' field for sorting 
+        // - Apply correct boolean syntax ({Line_Sheet} = 1)
+        // - Use proper sort format (sort[0][field]=SKU&sort[0][direction]=asc)
       });
 
       // Validate products

@@ -113,6 +113,7 @@ body {
   align-items: center;
   justify-content: space-between;
   height: 100%;
+  padding: .75rem 1.75rem 0rem 1.75rem;
 }
 
 .brand {
@@ -209,6 +210,7 @@ body {
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-md);
   overflow: hidden;
+  min-width: 400px;
 }
 
 .panel-section {

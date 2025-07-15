@@ -114,7 +114,7 @@ export const FIELD_PATTERNS = {
 // Configuration for query building
 export const QUERY_CONFIG = {
   activeProducts: {
-    filterTemplate: (activeField) => `AND({${activeField}} = TRUE)`,
+    filterTemplate: (activeField) => `{${activeField}} = 1`,
     sortTemplate: (codeField) => [{ field: codeField, direction: 'asc' }]
   },
   

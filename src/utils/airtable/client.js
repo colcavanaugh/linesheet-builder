@@ -95,6 +95,10 @@ class AirtableClient {
   }
 
   async executeRequest(url, options = {}) {
+    console.log('🔍 Debug - URL:', url);
+    console.log('🔍 Debug - options:', options);
+    console.log('🔍 Debug - options.headers:', options.headers);
+    
     const requestOptions = {
       method: 'GET',
       headers: {
@@ -104,6 +108,8 @@ class AirtableClient {
       },
       ...options
     };
+    
+    console.log('🔍 Debug - final requestOptions:', requestOptions);
 
     let retries = 0;
     const maxRetries = APP_CONFIG.api.airtable.rateLimit.maxRetries;

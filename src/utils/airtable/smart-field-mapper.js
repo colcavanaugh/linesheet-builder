@@ -207,10 +207,14 @@ export class SmartFieldMapper {
       query.filterByFormula = queryTemplate.filterTemplate(mappings.active.airtableField);
     }
 
-    // Add sort if template exists
+    // FIX: Use proper Airtable sort format instead of JSON.stringify
     if (queryTemplate.sortTemplate && mappings.productCode?.airtableField) {
       const sortArray = queryTemplate.sortTemplate(mappings.productCode.airtableField);
-      query.sort = JSON.stringify(sortArray); // Convert to JSON string for URL
+      // Airtable expects multiple sort parameters like sort[0][field]=SKU&sort[0][direction]=asc
+      sortArray.forEach((sortObj, index) => {
+        query[`sort[${index}][field]`] = sortObj.field;
+        query[`sort[${index}][direction]`] = sortObj.direction;
+      });
     }
 
     return query;
