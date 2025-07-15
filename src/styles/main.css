@@ -381,6 +381,9 @@ body {
   border-radius: var(--border-radius);
   overflow: hidden;
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  height: 520px; /* Fixed height for all cards */
+  display: flex;
+  flex-direction: column;
 }
 
 .product-card:hover {
@@ -391,16 +394,32 @@ body {
 .product-image {
   position: relative;
   width: 100%;
-  height: 200px;
+  height: 400px; /* Fixed image height */
   overflow: hidden;
   background: var(--bg-secondary);
+  flex-shrink: 0;
 }
 
+/* Smart image fitting based on aspect ratio */
 .product-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
   transition: transform var(--transition-normal);
+}
+
+.product-image--portrait img {
+  object-fit: contain; /* Show full portrait images */
+  object-position: center;
+}
+
+.product-image--landscape img {
+  object-fit: cover; /* Crop landscape images nicely */
+  object-position: center;
+}
+
+.product-image--square img {
+  object-fit: cover;
+  object-position: center;
 }
 
 .product-card:hover .product-image img {
@@ -409,6 +428,15 @@ body {
 
 .product-info {
   padding: var(--space-lg);
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr auto; /* Details take available space, prices take needed space */
+  gap: var(--space-md);
+  align-items: start; /* Align items to top */
+}
+
+.product-details {
+  flex: 1;
 }
 
 .product-name {
@@ -416,13 +444,6 @@ body {
   color: var(--text-primary);
   margin-bottom: var(--space-xs);
   font-size: 1rem;
-}
-
-.product-code {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  font-family: 'Monaco', 'Consolas', monospace;
-  margin-bottom: var(--space-xs);
 }
 
 .product-material {
@@ -435,17 +456,14 @@ body {
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
+  text-align: right; /* Right-align the prices */
+  min-width: 80px; /* Ensure minimum width for prices */
 }
 
 .wholesale-price {
   font-weight: 600;
   color: var(--color-primary);
   font-size: 1.125rem;
-}
-
-.retail-price {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
 }
 
 /* Form Elements */

@@ -386,25 +386,53 @@ class LineSheetApp {
     card.className = 'product-card';
     
     const imageUrl = product.images.length > 0 
-      ? product.images[0].thumbnails?.small?.url || product.images[0].url 
+      ? product.images[0].url 
       : '/images/placeholder-product.png';
     
+    // Determine image orientation
+    const imageClass = this.getImageOrientationClass(product.images[0]);
+    
     card.innerHTML = `
-      <div class="product-image">
+      <div class="product-image ${imageClass}">
         <img src="${imageUrl}" alt="${product.productName}" loading="lazy">
       </div>
       <div class="product-info">
-        <h3 class="product-name">${product.productName}</h3>
-        <p class="product-code">${product.productCode}</p>
-        <p class="product-material">${product.material}</p>
+        <div class="product-details">
+          <h3 class="product-name">${product.productName}</h3>
+          <p class="product-material">${product.material}</p>
+        </div>
         <div class="product-prices">
-          <span class="wholesale-price">${product.wholesalePrice}</span>
-          ${product.retailPrice ? `<span class="retail-price">MSRP: ${product.retailPrice}</span>` : ''}
+          <span class="wholesale-price">$ ${product.wholesalePrice}</span>
         </div>
       </div>
     `;
     
     return card;
+  }
+
+  getImageOrientationClass(image) {
+    if (!image || !image.thumbnails) {
+      return 'product-image--square';
+    }
+    
+    // Check thumbnails for dimensions
+    const large = image.thumbnails.large;
+    const full = image.thumbnails.full;
+    const small = image.thumbnails.small;
+    
+    const thumb = large || full || small;
+    
+    if (thumb && thumb.width && thumb.height) {
+      const aspectRatio = thumb.width / thumb.height;
+      
+      if (aspectRatio < 0.9) {
+        return 'product-image--portrait'; // Use object-fit: contain
+      } else if (aspectRatio > 1.1) {
+        return 'product-image--landscape'; // Use object-fit: cover
+      }
+    }
+    
+    return 'product-image--square';
   }
 
   renderPreview() {
