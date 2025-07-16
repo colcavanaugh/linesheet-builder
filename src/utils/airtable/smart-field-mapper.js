@@ -42,8 +42,8 @@ export class SmartFieldMapper {
   async discoverFields(airtableClient) {
     console.log('🔍 Discovering field mappings...');
     
-    // Get a few sample records to analyze
-    const sampleRecords = await this.getSampleRecords(airtableClient, 3);
+    // Get a few sample records to analyze - INCREASED FROM 3 TO 15
+    const sampleRecords = await this.getSampleRecords(airtableClient, 15);
     
     if (sampleRecords.length === 0) {
       throw new Error('No sample records found for field discovery');
@@ -57,7 +57,7 @@ export class SmartFieldMapper {
   }
 
   // Get sample records for analysis
-  async getSampleRecords(airtableClient, maxRecords = 3) {
+  async getSampleRecords(airtableClient, maxRecords = 15) {  // CHANGED DEFAULT FROM 3 TO 15
     try {
       // Make a simple request without any field-specific filters
       const url = `https://api.airtable.com/v0/${airtableClient.baseId}/${airtableClient.tableName}?maxRecords=${maxRecords}`;
