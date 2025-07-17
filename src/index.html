@@ -4,23 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gilty Boy Line Sheet Builder</title>
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg">
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Styles -->
-    <link rel="stylesheet" href="/styles/fonts.css">
-    <link rel="stylesheet" href="/styles/main.css">
-    
-    <!-- Meta tags -->
-    <meta name="description" content="Professional wholesale line sheet generator for jewelry designers">
-    <meta name="keywords" content="linesheet, wholesale, jewelry, catalog, airtable">
-    <meta name="author" content="Col Cavanaugh">
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Header -->
@@ -28,26 +14,25 @@
         <div class="container">
             <div class="header-content">
                 <div class="brand">
-                    <img src="/assets/logos/gilty-boy-logo.svg" alt="Gilty Boy" class="brand-logo" onerror="this.style.display='none'">
-                    <h1 class="brand-title">Line Sheet Builder</h1>
+                    <h1 class="brand-title">Gilty Boy Line Sheet Builder</h1>
                 </div>
                 
-                <nav class="header-nav">
+                <div class="header-nav">
                     <div class="connection-status-wrapper">
-                        <span id="connection-status" class="connection-status status-disconnected">Not Connected</span>
+                        <div id="connection-status" class="connection-status status-disconnected">
+                            Not Connected
+                        </div>
                     </div>
                     
                     <div class="header-actions">
-                        <button id="settings" class="btn btn-ghost" title="Settings">
+                        <button id="settings" class="btn btn-ghost">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="12" cy="12" r="3"></circle>
-                                <path d="m12 1 0 6m0 6 0 6"></path>
-                                <path d="m17.5 6.5-3.5 3.5m-7 0-3.5-3.5"></path>
-                                <path d="m17.5 17.5-3.5-3.5m-7 0-3.5 3.5"></path>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
                             </svg>
                         </button>
                     </div>
-                </nav>
+                </div>
             </div>
         </div>
     </header>
@@ -55,27 +40,24 @@
     <!-- Main Content -->
     <main class="app-main">
         <div class="container">
-            <!-- Dashboard Section -->
-            <section class="dashboard" id="dashboard">
+            <div class="dashboard">
                 <!-- Control Panel -->
                 <div class="control-panel">
                     <div class="panel-section">
-                        <h2>Connect Your Data</h2>
-                        <p>Connect to your Airtable base to load product information.</p>
+                        <h2>Connect to Airtable</h2>
+                        <p>Load your product data from Airtable to generate professional line sheets.</p>
                         
                         <div class="connection-controls">
                             <button id="connect-airtable" class="btn btn-primary">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 12h-8"></path>
-                                    <path d="m13 16 4-4-4-4"></path>
-                                    <path d="M3 12h8"></path>
+                                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
                                 </svg>
-                                Connect to Airtable
+                                Connect & Load
                             </button>
                             
-                            <button id="refresh-data" class="btn btn-secondary" disabled>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                            <button id="refresh-data" class="btn btn-secondary">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 3"></path>
                                     <path d="M21 3v5h-5"></path>
                                     <path d="m21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
                                     <path d="M3 21v-5h5"></path>
@@ -145,32 +127,78 @@
                             </button>
                         </div>
                     </div>
+
+                    <!-- NEW: Line Sheet Preview Controls -->
+                    <div class="panel-section">
+                        <h2>Line Sheet Preview</h2>
+                        <p>Generate and preview your line sheet before exporting</p>
+                        
+                        <div class="preview-controls">
+                            <button id="preview-linesheet" class="btn btn-primary">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                                Preview Line Sheet
+                            </button>
+                            
+                            <button id="toggle-preview-panel" class="btn btn-secondary">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9"></path>
+                                    <path d="M9 21h6"></path>
+                                    <path d="M12 18v3"></path>
+                                </svg>
+                                Show Preview
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Product Grid -->
+                <!-- Content Area -->
                 <div class="content-area">
                     <div class="content-header">
-                        <h2>Your Products</h2>
-                        <p>Products loaded from your Airtable base will appear here.</p>
+                        <h2>Product Catalog</h2>
+                        <p>Your current product collection ready for line sheet generation</p>
                     </div>
                     
-                    <div id="product-grid" class="product-grid">
+                    <div class="product-grid" id="product-grid">
+                        <!-- Product cards will be rendered here -->
                         <div class="empty-state">
                             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                                <polyline points="21,15 16,10 5,21"></polyline>
+                                <path d="M20 6L9 17l-5-5"/>
                             </svg>
-                            <h3>No Products Yet</h3>
+                            <h3>No Products Loaded</h3>
                             <p>Connect to Airtable to load your product catalog</p>
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
+
+            <!-- NEW: Line Sheet Preview Panel -->
+            <div id="linesheet-preview-panel" class="preview-panel" style="display: none;">
+                <div class="preview-panel-header">
+                    <h2>Line Sheet Preview</h2>
+                    <div class="preview-panel-actions">
+                        <button id="close-preview-panel" class="btn btn-ghost">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                            Close
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="preview-panel-content">
+                    <div id="linesheet-preview-content" class="linesheet-preview-content">
+                        <!-- Generated line sheet HTML will be inserted here -->
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
-    <!-- Loading Indicator -->
+    <!-- Loading Overlay -->
     <div id="loading-indicator" class="loading-overlay" style="display: none;">
         <div class="loading-content">
             <div class="loading-spinner"></div>
@@ -178,27 +206,10 @@
         </div>
     </div>
 
-    <!-- Notifications -->
+    <!-- Notifications Container -->
     <div id="notifications" class="notifications-container"></div>
 
-    <!-- Footer -->
-    <footer class="app-footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-info">
-                    <p>&copy; 2025 Col. Made with ❤️ for Trevor.</p>
-                </div>
-                
-                <div class="footer-links">
-                    <a href="#" class="footer-link">Documentation</a>
-                    <a href="#" class="footer-link">Support</a>
-                    <a href="https://github.com/your-username/gilty-boy-linesheet-builder" class="footer-link" target="_blank">GitHub</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Scripts -->
-    <script type="module" src="/js/main.js"></script>
+    <!-- Application Script -->
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

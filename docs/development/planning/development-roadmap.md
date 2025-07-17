@@ -41,177 +41,273 @@
 
 **Deliverable:** Basic web interface that displays Airtable products
 
-## Phase 2: Core Line Sheet Generation (Week 2-3)
-**Goal:** Build the core functionality for generating line sheets
+## Phase 2: Line Sheet Generation System (Week 2-3)
+**Goal:** Add line sheet preview and generation capabilities to existing web app
 
-### 2.1 Product Display Components (Days 8-10)
-- [ ] Create ProductCard component for individual items
-- [ ] Implement product image handling and optimization
-- [ ] Build product grid layout system
-- [ ] Add product filtering and sorting
-- [ ] Handle missing data gracefully
+### 2.1 Line Sheet Preview Foundation (Days 8-10)
+**Leverage:** Existing `state.products`, `state.organizedProducts`, and UI system
+**Build:** Preview generation and display system
 
-**Deliverable:** Clean product display with real Airtable data
+#### Day 8-9: Line Sheet HTML Generation
+- [X] Extend existing `main.js` with `generateLinesheetHTML()` method
+  ```javascript
+  // Build on existing state and organization
+  generateLinesheetHTML() {
+    const organizedProducts = this.state.organizedProducts;
+    return this.buildLinesheetDocument(organizedProducts, this.state.config);
+  }
+  ```
+- [X] Add preview container to existing `index.html` UI
 
-### 2.2 Line Sheet Templates (Days 11-14)
-- [ ] Design and implement "Modern" template
-- [ ] Create responsive layout for different screen sizes
-- [ ] Add print-specific CSS styles
-- [ ] Implement table of contents generation
-- [ ] Create cover page with branding elements
+#### Day 10: Preview Integration & Display
+- [X] Add preview controls to existing interface
+  ```html
+  <!-- Add to existing control panel -->
+  <button id="preview-linesheet">Preview Line Sheet</button>
+  <button id="toggle-preview-panel">Show/Hide Preview</button>
+  ```
+- [X] Extend existing event system with preview handlers
+- [X] Create preview panel/modal that displays generated HTML
+- [X] Connect preview updates to existing configuration changes
 
-**Deliverable:** Complete line sheet template with professional appearance
+**Deliverable:** Live preview of line sheet catalog using existing product data
 
-### 2.3 Customization Interface (Days 15-17)
-- [ ] Build template selection interface
-- [ ] Add font selection capabilities
-- [ ] Implement color scheme customization
-- [ ] Create branding upload functionality
-- [ ] Add real-time preview updates
+### 2.2 Template & Document Structure (Days 11-14)
+**Leverage:** Existing organized product data and configuration system
+**Build:** Complete line sheet document generation following linesheet-planning.md
 
-**Deliverable:** User interface for customizing line sheet appearance
+#### Day 11-12: Document Structure Implementation
+- [ ] Create `generateCoverPage(config)` method using existing branding configuration
+- [ ] Implement `generateTableOfContents(organizedProducts)` using existing LineSheetOrganizer output
+- [ ] Build `generateProductCatalog(organizedProducts, config)` with section-based rendering
+- [ ] Structure document following linesheet-planning.md specifications (Cover → TOC → Catalog)
 
-## Phase 3: Export Functionality (Week 4)
-**Goal:** Implement high-quality PDF export and alternative formats
+#### Day 13-14: Print-Optimized Styling
+- [ ] Enhance existing print CSS with line sheet-specific styles
+- [ ] Implement page break controls per linesheet-planning.md layout requirements
+- [ ] Add print-specific image handling and optimization
+- [ ] Create separate screen vs. print styling for preview vs. export
 
-### 3.1 PDF Generation (Days 18-21)
-- [ ] Set up Puppeteer for PDF generation
-- [ ] Implement print-optimized CSS
-- [ ] Add page break handling
-- [ ] Create table of contents with working links
-- [ ] Optimize for print quality and file size
+**Deliverable:** Complete line sheet document generation with professional layout
 
-**Deliverable:** Professional PDF export functionality
+### 2.3 Configuration Interface Enhancement (Days 15-17)
+**Leverage:** Existing UI event system and state management
+**Build:** Dynamic configuration controls
 
-### 3.2 Alternative Export Options (Days 22-24)
-- [ ] Implement Markdown export for easy editing
-- [ ] Add HTML export for web sharing
-- [ ] Create email-friendly format
-- [ ] Add batch export capabilities
-- [ ] Implement download management
+#### Day 15-16: Interactive Configuration Panel
+- [ ] Enhance existing UI with drag-and-drop product type ordering
+- [ ] Build font selector using existing `APP_CONFIG.ui.fonts`
+- [ ] Create template selector integrated with existing template system
+- [ ] Add real-time preview updates to existing `state.config`
 
-**Deliverable:** Multiple export formats for different use cases
+#### Day 17: Configuration Persistence
+- [ ] Extend existing `loadSavedConfig()` method
+- [ ] Add configuration export/import
+- [ ] Integrate with existing local storage system
 
-### 3.3 User Experience Polish (Days 25-28)
-- [ ] Add progress indicators for long operations
-- [ ] Implement error recovery mechanisms
-- [ ] Create user-friendly error messages
-- [ ] Add keyboard shortcuts for power users
-- [ ] Optimize loading times and responsiveness
+**Deliverable:** Full customization interface with persistent settings
 
-**Deliverable:** Smooth, professional user experience
+---
 
-## Phase 4: MVP Completion & Testing (Week 5-6)
-**Goal:** Finalize MVP and ensure production readiness
+## Phase 3: Professional PDF Export System (Week 4)
+**Goal:** Convert preview HTML to production-quality PDFs
 
-### 4.1 Quality Assurance (Days 29-32)
-- [ ] Comprehensive testing with real product data
-- [ ] Cross-browser compatibility testing
-- [ ] Print quality validation across different printers
-- [ ] Performance optimization and load testing
-- [ ] User acceptance testing with your partner
+### 3.1 PDF Generation Engine (Days 18-21)
+**Leverage:** Existing preview HTML generation and print CSS
+**Build:** Puppeteer-based PDF export system
 
-**Deliverable:** Fully tested, production-ready application
+#### Day 18-19: Core PDF Export
+- [ ] Create `src/utils/pdf/generator.js` with Puppeteer integration
+  ```javascript
+  // Use existing preview HTML as source
+  async generatePDF() {
+    const linesheetHTML = this.generateLinesheetHTML();
+    return await this.convertHTMLToPDF(linesheetHTML, this.state.config);
+  }
+  ```
+- [ ] Implement high-quality PDF settings (print DPI, color profiles, margins)
+- [ ] Add font loading and fallback handling for existing font system
+- [ ] Create PDF-specific CSS overrides for existing print styles
+
+#### Day 20-21: Export Quality & Controls
+- [ ] Implement page break optimization for product cards and sections
+- [ ] Add image compression and quality controls
+- [ ] Create export progress indicators using existing loading system
+- [ ] Build export settings panel (page size, margins, quality options)
+
+**Deliverable:** Professional PDF export producing print-shop quality catalogs
+
+### 3.2 Export Format Options (Days 22-24)
+**Leverage:** Existing data organization and template system
+**Build:** Multiple export formats
+
+#### Day 22: Alternative Export Engines
+- [ ] Create `src/utils/markdown/exporter.js` using existing organized data
+- [ ] Build HTML export using existing template renderer
+- [ ] Add email-friendly format generation
+
+#### Day 23-24: Export Management System
+- [ ] Integrate export buttons with existing UI event system
+- [ ] Add progress indicators using existing `updateLoadingState()`
+- [ ] Implement download management with existing state system
+- [ ] Create export history and settings
+
+**Deliverable:** Multiple export formats with professional quality
+
+### 3.3 Quality Assurance & Testing (Days 25-28)
+**Leverage:** Existing DevHelpers and test data
+**Build:** Comprehensive testing system
+
+#### Day 25-26: Visual Regression Testing
+- [ ] Extend existing `DevHelpers` with PDF comparison tools
+- [ ] Create reference PDF generation for testing
+- [ ] Add cross-platform font rendering tests
+- [ ] Build automated print quality validation
+
+#### Day 27-28: User Experience Optimization
+- [ ] Enhance existing error handling in `LineSheetApp`
+- [ ] Add keyboard shortcuts to existing event system
+- [ ] Optimize loading times for large product catalogs
+- [ ] Create user feedback system
+
+**Deliverable:** Robust, tested PDF generation system
+
+---
+
+## Phase 4: MVP Completion & Production (Week 5-6)
+**Goal:** Production deployment with comprehensive testing
+
+### 4.1 Integration Testing & Polish (Days 29-32)
+**Leverage:** Complete existing system
+**Build:** Production-ready application
+
+#### Day 29-30: End-to-End Testing
+- [ ] Test complete workflow: Airtable → Display → Customize → Export
+- [ ] Validate all existing utilities work with new components
+- [ ] Cross-browser testing with existing UI system
+- [ ] Print quality validation across multiple printers
+
+#### Day 31-32: Performance & Reliability
+- [ ] Optimize existing `AirtableClient` caching
+- [ ] Enhance existing error recovery in `main.js`
+- [ ] Add monitoring to existing state management
+- [ ] Load testing with large product catalogs
+
+**Deliverable:** Production-ready application with comprehensive testing
 
 ### 4.2 Documentation & Deployment (Days 33-35)
-- [ ] Create user guide for your partner
-- [ ] Set up production hosting (Netlify/Vercel)
-- [ ] Configure custom domain and SSL
-- [ ] Create backup and recovery procedures
-- [ ] Document maintenance procedures
+**Leverage:** Existing configuration system
+**Build:** Production deployment
 
-**Deliverable:** Deployed application with complete documentation
+#### Day 33-34: User Documentation
+- [ ] Create user guide for existing interface
+- [ ] Document all existing configuration options
+- [ ] Create troubleshooting guide for common issues
+- [ ] Build video tutorials for key workflows
 
-### 4.3 Training & Handoff (Days 36-42)
-- [ ] Conduct training session with your partner
-- [ ] Create video tutorials for common tasks
-- [ ] Set up support documentation
-- [ ] Establish update and maintenance schedule
-- [ ] Plan future enhancement priorities
+#### Day 35: Production Deployment
+- [ ] Deploy to Netlify/Vercel using existing build system
+- [ ] Configure environment variables for existing Airtable integration
+- [ ] Set up SSL and custom domain
+- [ ] Create backup and monitoring systems
 
-**Deliverable:** Your partner confidently using the system independently
+**Deliverable:** Live, documented application ready for daily use
 
-## Technical Implementation Order
+### 4.3 Training & Long-term Success (Days 36-42)
+**Goal:** Ensure sustainable adoption and future growth
 
-### Week 1 Focus Areas
+#### Day 36-38: User Training
+- [ ] Conduct hands-on training with your partner
+- [ ] Test all existing functionality with real business data
+- [ ] Create custom workflows for your partner's specific needs
+- [ ] Establish feedback and improvement process
+
+#### Day 39-42: Future-Proofing
+- [ ] Document maintenance procedures for existing codebase
+- [ ] Plan enhancement roadmap based on existing architecture
+- [ ] Set up monitoring and support systems
+- [ ] Create knowledge transfer documentation
+
+**Deliverable:** Your partner independently using the system with confidence
+
+---
+
+## Technical Implementation Strategy
+
+### 🔄 **Building on Existing Foundation**
 ```javascript
-// Priority files to create:
-src/utils/airtable/client.js
-src/utils/airtable/validator.js
-src/config/airtable.config.js
-src/js/app.js
-src/styles/main.css
+// KEEP: Your existing working systems
+✅ renderProductGrid() - Dashboard product display
+✅ createProductCard() - Web interface cards  
+✅ LineSheetOrganizer - Product organization
+✅ AirtableClient - Data fetching
+✅ Event system - UI interactions
+✅ Configuration - Template/font selection
+
+// ADD: Line sheet generation extensions
+➕ generateLinesheetHTML() - Document generation
+➕ createLinesheetProductCard() - Print-optimized cards
+➕ PDF export system - Professional output
+➕ Preview interface - Live line sheet viewing
 ```
 
-### Week 2-3 Focus Areas
+### 🆕 **New Methods & Components**
 ```javascript
-// Core components:
-src/components/ProductCard/ProductCard.js
-src/components/LineSheet/LineSheetBuilder.js
-src/components/TableOfContents/TOCGenerator.js
-templates/linesheet/modern/template.html
-templates/linesheet/modern/styles.css
+// Extension methods for main.js
+generateLinesheetHTML() // Creates complete line sheet document
+generateCoverPage(config) // Brand cover page
+generateTableOfContents(organizedProducts) // Product index
+generateProductCatalog(organizedProducts, config) // Main catalog
+createLinesheetProductCard(product, layout) // Print-optimized cards
+showLinesheetPreview() // Preview display
+exportToPDF() // PDF generation
+
+// New utilities
+src/utils/pdf/generator.js // Puppeteer PDF export
+src/utils/export/manager.js // Export workflow management
 ```
 
-### Week 4 Focus Areas
-```javascript
-// Export functionality:
-src/utils/pdf/generator.js
-src/utils/markdown/exporter.js
-src/utils/formatting/printer.js
-scripts/build/optimize.js
+### 🔧 **Integration Architecture**
+```
+Existing Web App                    New Line Sheet System
+┌─────────────────┐               ┌──────────────────────┐
+│ Dashboard       │               │ Preview Panel        │
+│ - Product grid  │──────────────▶│ - Generated catalog  │
+│ - Controls      │               │ - Export controls    │
+│ - Settings      │               │ - Page navigation    │
+└─────────────────┘               └──────────────────────┘
+        │                                   │
+        ▼                                   ▼
+┌─────────────────┐               ┌──────────────────────┐
+│ Airtable Data   │               │ PDF Export           │
+│ (existing)      │               │ (new)                │
+└─────────────────┘               └──────────────────────┘
 ```
 
-## Risk Mitigation
+### 📊 **Data Flow Enhancement**
+```
+Current: Airtable → Validator → Organizer → Dashboard Display
+Adding: Airtable → Validator → Organizer → Line Sheet Preview → PDF Export
+```
 
-### Technical Risks
-**Airtable API Rate Limits**
-- *Mitigation:* Implement caching and request batching
-- *Fallback:* Manual data entry interface
+## Success Criteria & Benefits
 
-**PDF Quality Issues**
-- *Mitigation:* Extensive testing with real printers
-- *Fallback:* HTML export with print instructions
+### **📈 Technical Benefits**
+- **Zero Breaking Changes**: All existing functionality preserved
+- **Incremental Development**: Each phase builds working features
+- **Shared Data Pipeline**: Line sheet uses same validated, organized data
+- **Integrated UX**: Preview and export integrated into existing interface
 
-**Browser Compatibility**
-- *Mitigation:* Progressive enhancement approach
-- *Fallback:* Core functionality works on all modern browsers
+### **🎯 User Experience Goals**
+- **Live Preview**: See exactly what the PDF will look like
+- **Easy Debugging**: Visual feedback for layout and formatting issues
+- **Professional Output**: Print-shop quality PDFs for wholesale buyers
+- **Seamless Workflow**: Generate catalogs without leaving the interface
 
-### User Experience Risks
-**Complex Interface**
-- *Mitigation:* Focus on single-user workflow optimization
-- *Fallback:* Simplified interface with fewer options
-
-**Data Loss**
-- *Mitigation:* Auto-save and backup systems
-- *Fallback:* Manual export capabilities
-
-## Success Metrics
-
-### Technical Metrics
-- [ ] Page load time < 2 seconds
-- [ ] PDF generation time < 10 seconds
-- [ ] 99%+ uptime for production deployment
-- [ ] Zero data loss incidents
-
-### User Experience Metrics
-- [ ] Your partner can generate line sheet in < 5 minutes
-- [ ] No technical support required for normal operations
-- [ ] Professional PDF quality suitable for wholesale buyers
-- [ ] Positive feedback from wholesale customers
-
-## Post-MVP Enhancements (Future Phases)
-
-### Phase 5: Advanced Features (Optional)
-- Bulk pricing updates
-- Client-specific pricing tiers
-- Inventory tracking integration
-- Order form generation
-- Email automation for sending line sheets
-
-### Phase 6: Business Growth (Optional)
-- Multi-user support
-- Template marketplace
-- Integration with other platforms
-- Mobile app development
-- Analytics and reporting
+### **📋 Validation Checkpoints**
+- **Phase 2.1**: Preview shows real products in line sheet format
+- **Phase 2.2**: Complete document structure with proper page breaks
+- **Phase 2.3**: Integrated preview updates with configuration changes
+- **Phase 3.1**: Professional PDF export matching preview exactly
+- **Phase 3.2**: Multiple export formats with consistent quality
+- **Phase 3.3**: Tested, reliable system ready for daily business use
