@@ -381,58 +381,130 @@ class LineSheetApp {
     });
   }
 
+  // createProductCard(product) {
+  //   const card = document.createElement('div');
+  //   card.className = 'product-card';
+    
+  //   const imageUrl = product.images.length > 0 
+  //     ? product.images[0].url 
+  //     : '/images/placeholder-product.png';
+    
+  //   // Determine image orientation
+  //   const imageClass = this.getImageOrientationClass(product.images[0]);
+    
+  //   card.innerHTML = `
+  //     <div class="product-image ${imageClass}">
+  //       <img src="${imageUrl}" alt="${product.productName}" loading="lazy">
+  //     </div>
+  //     <div class="product-info">
+  //       <div class="product-details">
+  //         <h3 class="product-name">${product.productName}</h3>
+  //         <p class="product-material">${product.material}</p>
+  //       </div>
+  //       <div class="product-prices">
+  //         <span class="wholesale-price">$ ${product.wholesalePrice}</span>
+  //       </div>
+  //     </div>
+  //   `;
+    
+  //   return card;
+  // }
+
+  // getImageOrientationClass(image) {
+  //   if (!image || !image.thumbnails) {
+  //     return 'product-image--square';
+  //   }
+    
+  //   // Check thumbnails for dimensions
+  //   const large = image.thumbnails.large;
+  //   const full = image.thumbnails.full;
+  //   const small = image.thumbnails.small;
+    
+  //   const thumb = large || full || small;
+    
+  //   if (thumb && thumb.width && thumb.height) {
+  //     const aspectRatio = thumb.width / thumb.height;
+      
+  //     if (aspectRatio < 0.9) {
+  //       return 'product-image--portrait'; // Use object-fit: contain
+  //     } else if (aspectRatio > 1.1) {
+  //       return 'product-image--landscape'; // Use object-fit: cover
+  //     }
+  //   }
+    
+  //   return 'product-image--square';
+  // }
+
+  /**
+   * Create a product card element with square layout based on image orientation
+   * @param {Object} product - Product data from Airtable
+   * @returns {HTMLElement} - Product card DOM element
+   */
   createProductCard(product) {
     const card = document.createElement('div');
-    card.className = 'product-card';
+    
+    // Determine layout based on image orientation
+    const imageOrientation = this.getImageOrientation(product.images[0]);
+    const layoutClass = imageOrientation === 'portrait' ? 'product-card--portrait' : 'product-card--landscape';
+    
+    card.className = `product-card ${layoutClass}`;
     
     const imageUrl = product.images.length > 0 
       ? product.images[0].url 
-      : '/images/placeholder-product.png';
+      : null;
     
-    // Determine image orientation
-    const imageClass = this.getImageOrientationClass(product.images[0]);
-    
-    card.innerHTML = `
-      <div class="product-image ${imageClass}">
+    // Create image section (with fallback for missing images)
+    const imageSection = imageUrl ? `
+      <div class="product-image">
         <img src="${imageUrl}" alt="${product.productName}" loading="lazy">
       </div>
+    ` : `
+      <div class="product-image product-image--placeholder">
+        <svg class="placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          <circle cx="8.5" cy="8.5" r="1.5"></circle>
+          <polyline points="21,15 16,10 5,21"></polyline>
+        </svg>
+      </div>
+    `;
+    
+    // Build the complete card HTML structure
+    card.innerHTML = `
+      ${imageSection}
       <div class="product-info">
         <div class="product-details">
+          <div class="product-sku">${product.productCode || 'SKU-000'}</div>
           <h3 class="product-name">${product.productName}</h3>
-          <p class="product-material">${product.material}</p>
+          <p class="product-material">${product.material || 'Material not specified'}</p>
         </div>
-        <div class="product-prices">
-          <span class="wholesale-price">$ ${product.wholesalePrice}</span>
-        </div>
+        <div class="product-price">$${(product.wholesalePrice || 0) % 1 === 0 ? (product.wholesalePrice || 0) : (product.wholesalePrice || 0).toFixed(2)}</div>
       </div>
     `;
     
     return card;
   }
 
-  getImageOrientationClass(image) {
+  /**
+   * Determine image orientation for layout purposes
+   * @param {Object} image - Image object from Airtable
+   * @returns {string} - 'portrait' or 'landscape'
+   */
+  getImageOrientation(image) {
     if (!image || !image.thumbnails) {
-      return 'product-image--square';
+      return 'landscape'; // Default to landscape for missing images
     }
     
-    // Check thumbnails for dimensions
-    const large = image.thumbnails.large;
-    const full = image.thumbnails.full;
-    const small = image.thumbnails.small;
-    
-    const thumb = large || full || small;
+    // Check thumbnails for dimensions (prefer larger sizes for accuracy)
+    const thumb = image.thumbnails.large || image.thumbnails.full || image.thumbnails.small;
     
     if (thumb && thumb.width && thumb.height) {
       const aspectRatio = thumb.width / thumb.height;
       
-      if (aspectRatio < 0.9) {
-        return 'product-image--portrait'; // Use object-fit: contain
-      } else if (aspectRatio > 1.1) {
-        return 'product-image--landscape'; // Use object-fit: cover
-      }
+      // Portrait if significantly taller than wide
+      return aspectRatio < 0.9 ? 'portrait' : 'landscape';
     }
     
-    return 'product-image--square';
+    return 'landscape'; // Default fallback
   }
 
   renderPreview() {
