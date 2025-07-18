@@ -1,0 +1,58 @@
+/* Content Area */
+.content-area {
+  background: var(--bg-primary);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  max-height: 1000px;
+  overflow-y: scroll;
+}
+
+.content-header {
+  padding: var(--space-xl);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.content-header h2 {
+  font-family: var(--font-brand);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.content-header p {
+  color: var(--text-secondary);
+}
+
+/* Product Grid */
+.product-grid {
+  padding: var(--space-xl);
+  min-height: 400px;
+}
+
+.product-grid:has(.empty-state) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.empty-state svg {
+  margin-bottom: var(--space-lg);
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.empty-state p {
+  color: var(--text-secondary);
+}

@@ -1,0 +1,140 @@
+/* Control Panel */
+.control-panel {
+  background: var(--bg-primary);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  min-width: 400px;
+}
+
+.panel-section {
+  padding: var(--space-xl);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.panel-section:last-child {
+  border-bottom: none;
+}
+
+.panel-section h2 {
+  font-family: var(--font-brand);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.panel-section p {
+  color: var(--text-secondary);
+  margin-bottom: var(--space-lg);
+}
+
+/* Connection Controls */
+.connection-controls {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+@media (max-width: 640px) {
+  .connection-controls {
+    flex-direction: column;
+  }
+}
+
+.data-status {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.product-count {
+  font-weight: 500;
+}
+
+/* Customization Controls */
+.customization-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+@media (max-width: 640px) {
+  .customization-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.control-group label {
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+}
+
+/* Font Preview */
+.font-preview-wrapper {
+  padding: var(--space-md);
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+}
+
+.font-preview {
+  font-size: 1.125rem;
+  color: var(--text-primary);
+  margin: 0;
+  transition: font-family var(--transition-normal);
+}
+
+/* Export Controls */
+.export-controls {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+@media (max-width: 640px) {
+  .export-controls {
+    flex-direction: column;
+  }
+}
+
+/* Preview Controls */
+.preview-controls {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+@media (max-width: 640px) {
+  .preview-controls {
+    flex-direction: column;
+  }
+}
+
+/* Print Button Enhancement */
+.print-preview-button {
+  background: var(--color-info);
+  color: white;
+  border: none;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.print-preview-button:hover {
+  background: #1e40af;
+}
+
+.print-preview-button:disabled {
+  background: var(--bg-tertiary);
+  color: var(--text-tertiary);
+  cursor: not-allowed;
+}

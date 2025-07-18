@@ -1,0 +1,37 @@
+/* Responsive Design */
+@media (max-width: 640px) {
+  .container {
+    padding: 0 var(--space-md);
+  }
+  
+  .brand-title {
+    font-size: 1.25rem;
+  }
+  
+  .header-nav {
+    gap: var(--space-md);
+  }
+  
+  .app-main {
+    padding: var(--space-lg) 0;
+  }
+  
+  .panel-section {
+    padding: var(--space-lg);
+  }
+  
+  .content-header {
+    padding: var(--space-lg);
+  }
+  
+  .product-grid {
+    padding: var(--space-lg);
+  }
+  
+  .notifications-container {
+    top: var(--space-md);
+    right: var(--space-md);
+    left: var(--space-md);
+    max-width: none;
+  }
+}

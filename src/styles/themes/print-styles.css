@@ -1,0 +1,18 @@
+/* Print Styles */
+@media print {
+  .app-header,
+  .app-footer,
+  .loading-overlay,
+  .notifications-container {
+    display: none !important;
+  }
+  
+  .app-main {
+    padding: 0;
+  }
+  
+  .product-card {
+    break-inside: avoid;
+    margin-bottom: var(--space-lg);
+  }
+}
