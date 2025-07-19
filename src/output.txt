@@ -1,0 +1,54 @@
+.
+|-- components
+|   |-- CoverPage
+|   |-- LineSheet
+|   |-- ProductCard
+|   `-- TableOfContents
+|-- config
+|   |-- app.config.js
+|   `-- field-mappings.js
+|-- index.html
+|-- js
+|   |-- components
+|   |-- config
+|   |-- core
+|   |-- generators
+|   |-- main.js
+|   `-- utils
+|-- output.txt
+|-- styles
+|   |-- backups
+|   |   `-- main.css.backup
+|   |-- base
+|   |   |-- base.css
+|   |   |-- responsive.css
+|   |   `-- variables.css
+|   |-- components
+|   |   |-- buttons.css
+|   |   |-- forms.css
+|   |   |-- loading.css
+|   |   |-- notifications.css
+|   |   `-- product-cards.css
+|   |-- fonts.css
+|   |-- layouts
+|   |   |-- control-panel.css
+|   |   |-- footer.css
+|   |   |-- header.css
+|   |   |-- layout.css
+|   |   |-- main-content.css
+|   |   |-- preview-panel.css
+|   |   `-- product-grid.css
+|   |-- main.css
+|   `-- themes
+|       `-- print-styles.css
+`-- utils
+    |-- airtable
+    |   |-- client.js
+    |   |-- smart-field-mapper.js
+    |   `-- validator.js
+    |-- formatting
+    |   `-- linesheet-organizer.js
+    |-- markdown
+    `-- pdf
+
+23 directories, 28 files

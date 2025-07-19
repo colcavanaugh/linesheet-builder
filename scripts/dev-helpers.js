@@ -1,9 +1,9 @@
 // scripts/dev-helpers.js
 // Development utilities and testing helpers
 
-import AirtableClient from '../src/utils/airtable/client.js';
-import AirtableValidator from '../src/utils/airtable/validator.js';
-import LineSheetOrganizer from '../src/utils/formatting/linesheet-organizer.js';
+import AirtableClient from '../src/js/utils/airtable/client.js';
+import AirtableValidator from '../src/js/utils/airtable/validator.js';
+import LineSheetOrganizer from '../src/js/utils/formatting/linesheet-organizer.js';
 
 // Sample test data for development
 export const SAMPLE_PRODUCTS = [
