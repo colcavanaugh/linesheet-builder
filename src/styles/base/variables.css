@@ -47,8 +47,8 @@
   --footer-height: 3rem;
   
   /* Fonts */
-  --font-brand: 'Playfair Display', serif;
-  --font-body: 'Inter', sans-serif;
+  --font-brand: 'Cardo', serif;
+  --font-body: 'Cardo', sans-serif;
   
   /* Transitions */
   --transition-fast: 0.15s ease-in-out;

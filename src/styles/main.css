@@ -55,6 +55,9 @@
 /* Print and theme styles */
 @import './themes/print-styles.css';
 
+/* PHASE 2.2: Line sheet document and PDF-optimized styles */
+@import './themes/linesheet-document.css';
+
 /* ================================
    IMPORT ORDER NOTES:
    

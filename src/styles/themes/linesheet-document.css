@@ -1,0 +1,655 @@
+/* src/styles/themes/linesheet-document.css */
+/* Line sheet document formatting with 8.5" x 11" paper layout */
+
+/* ===== VARIABLES FOR PAPER-SIZED LAYOUT ===== */
+:root {
+  /* Digital colors (slightly off-black/off-white for screen viewing) */
+  --linesheet-text-digital: #1a1a1a;
+  --linesheet-bg-digital: #fafafa;
+  
+  /* Print colors (pure black/white for PDF export) */
+  --linesheet-text-print: #000000;
+  --linesheet-bg-print: #ffffff;
+  
+  /* Brand colors */
+  --linesheet-brand-primary: #8b4513;
+  --linesheet-brand-secondary: #d4af37;
+  --linesheet-accent: #f5f5dc;
+  
+  /* Paper dimensions - 8.5" x 11" with margins */
+  --paper-width: 8.5in;
+  --paper-height: 11in;
+  --paper-margin: 0.75in;
+  --content-width: 7in;   /* 8.5" - (0.75" * 2) */
+  --content-height: 9.5in; /* 11" - (0.75" * 2) */
+  
+  /* Typography optimized for print */
+  --linesheet-font-size-base: 12pt;
+  --linesheet-line-height: 1.4;
+  
+  /* Spacing in print units */
+  --linesheet-space-xs: 6pt;
+  --linesheet-space-sm: 12pt;
+  --linesheet-space-md: 18pt;
+  --linesheet-space-lg: 24pt;
+  --linesheet-space-xl: 36pt;
+}
+
+/* ===== BASE LINESHEET DOCUMENT WITH PAPER SIZING ===== */
+
+.linesheet-preview-content {
+  font-family: 'Cardo', serif;
+  font-size: var(--linesheet-font-size-base);
+  line-height: var(--linesheet-line-height);
+  color: var(--linesheet-text-digital);
+  background-color: var(--linesheet-bg-digital);
+  
+  /* Paper-sized container */
+  width: var(--paper-width);
+  margin: 0 auto;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.linesheet-preview-content * {
+  box-sizing: border-box;
+}
+
+/* ===== PAGE LAYOUT SYSTEM ===== */
+
+.cover-page,
+.table-of-contents,
+.category-section {
+  width: var(--paper-width);
+  height: var(--paper-height);
+  padding: var(--paper-margin);
+  margin: 0 0 20px 0; /* Small gap between pages in preview */
+  background: white;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  page-break-after: always;
+  break-after: page;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== COVER PAGE (Following linesheet-planning.md layout) ===== */
+
+.cover-page {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.cover-content {
+  max-width: 5in;
+  width: 100%;
+}
+
+.brand-name {
+  font-size: 48pt;
+  font-weight: bold;
+  margin-bottom: var(--linesheet-space-sm);
+  color: var(--linesheet-brand-primary);
+  letter-spacing: 2pt;
+  text-transform: uppercase;
+}
+
+.brand-tagline {
+  font-size: 16pt;
+  color: var(--linesheet-brand-secondary);
+  margin-bottom: var(--linesheet-space-xl);
+  font-style: italic;
+}
+
+.brand-statement {
+  margin: var(--linesheet-space-xl) 0;
+  font-size: 11pt;
+  line-height: 1.6;
+  text-align: left;
+  color: var(--linesheet-text-digital);
+}
+
+.cover-details {
+  margin: var(--linesheet-space-xl) 0;
+  text-align: left;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: var(--linesheet-space-sm) 0;
+  padding: var(--linesheet-space-xs) 0;
+  border-bottom: 1pt solid #e0e0e0;
+}
+
+.detail-label {
+  font-weight: bold;
+  font-size: 10pt;
+  color: var(--linesheet-text-digital);
+}
+
+.detail-value {
+  font-size: 10pt;
+  color: var(--linesheet-brand-secondary);
+  font-weight: 500;
+}
+
+.contact-section {
+  margin-top: var(--linesheet-space-lg);
+  padding-top: var(--linesheet-space-md);
+  border-top: 2pt solid var(--linesheet-brand-primary);
+  text-align: left;
+}
+
+.contact-section h3 {
+  font-size: 14pt;
+  color: var(--linesheet-brand-primary);
+  margin-bottom: var(--linesheet-space-sm);
+  font-weight: bold;
+  text-align: center;
+}
+
+.contact-section h4 {
+  font-size: 12pt;
+  color: var(--linesheet-brand-primary);
+  margin: var(--linesheet-space-md) 0 var(--linesheet-space-sm) 0;
+  font-weight: bold;
+}
+
+.contact-section p {
+  margin: var(--linesheet-space-xs) 0;
+  font-size: 11pt;
+}
+
+.artist-info {
+    margin-top: var(--linesheet-space-lg);
+    padding-top: var(--linesheet-space-md);
+    border-top: 2pt solid var(--linesheet-brand-primary);
+    text-align: left;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    max-width: 600px;
+}
+
+/* .ordering-instructions {
+  margin-top: var(--linesheet-space-md);
+} */
+
+.ordering-instructions ol {
+  font-size: 11pt;
+  line-height: 1.25;
+  padding-left: 18pt;
+  margin: var(--linesheet-space-sm) 0;
+}
+
+.ordering-instructions li {
+  margin-bottom: var(--linesheet-space-xs);
+}
+
+/* ===== TABLE OF CONTENTS (20% header, 70% body, 10% footer) ===== */
+
+.table-of-contents {
+  /* No additional flex properties needed - uses page layout */
+}
+
+/* .toc-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+} */
+
+.toc-header h2 {
+  font-size: 24pt;
+  margin-bottom: var(--linesheet-space-sm);
+  color: var(--linesheet-brand-primary);
+  font-weight: bold;
+  margin: 0;
+}
+
+.toc-summary {
+  font-size: 11pt;
+  color: #666;
+  margin-bottom: var(--linesheet-space-lg);
+}
+
+.toc-content {
+  height: 90%;
+  overflow: hidden; /* Prevent content from flowing beyond page */
+}
+
+.toc-category {
+  margin: var(--linesheet-space-lg) 0 var(--linesheet-space-sm) 0;
+  padding-bottom: var(--linesheet-space-xs);
+  border-bottom: 1pt solid var(--linesheet-brand-primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.category-name {
+  font-size: 14pt;
+  font-weight: bold;
+  color: var(--linesheet-brand-primary);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.category-page {
+  font-size: 12pt;
+  font-weight: bold;
+  color: var(--linesheet-brand-secondary);
+}
+
+.toc-products {
+  margin-left: var(--linesheet-space-md);
+  margin-bottom: var(--linesheet-space-md);
+}
+
+.toc-product-row {
+  display: grid;
+  grid-template-columns: 0.5fr .8fr 0.75fr 0.125fr;
+  gap: var(--linesheet-space-sm);
+  padding: 4pt 0;
+  font-size: 10pt;
+  border-bottom: 0.5pt solid #eee;
+  align-items: center;
+}
+
+.product-sku {
+  font-weight: bold;
+  color: var(--linesheet-text-digital);
+  font-family: 'Cardo', monospace;
+}
+
+.product-material {
+  color: #666;
+}
+
+.product-wholesale-price {
+  font-weight: bold;
+  color: var(--linesheet-brand-primary);
+}
+
+.product-page {
+  text-align: right;
+  color: var(--linesheet-brand-secondary);
+  font-weight: 500;
+}
+
+.toc-footer {
+  height: 10%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  font-size: 10pt;
+  color: #666;
+}
+
+/* ===== PRODUCT CATALOG (20% header, 70% body, 10% footer) ===== */
+
+.category-section {
+  /* Uses page layout from base styles */
+}
+
+.catalog-header {
+  height: 10%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.category-title {
+  font-size: 18pt;
+  color: var(--linesheet-brand-primary);
+  margin: 0;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding-bottom: var(--linesheet-space-sm);
+  border-bottom: 1pt solid var(--linesheet-brand-primary);
+}
+
+.catalog-body {
+  height: 80%;
+  align-items: center;
+  justify-content: center;
+}
+
+/* CRITICAL: 2x2 grid layout fitting in 70% of page body */
+.linesheet-preview-content .product-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1.5fr 1.5fr;
+  gap: var(--linesheet-space-md);
+  width: 100%;
+  height: 100%;
+}
+
+/* LINESHEET-SPECIFIC PRODUCT CARDS - inherit from existing product-card styles */
+.linesheet-preview-content .linesheet-product-card {
+  /* Inherit all product-card styles */
+  background: var(--bg-primary, white);
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: var(--border-radius, 6pt);
+  overflow: hidden;
+  transition: transform var(--transition-fast, 0.2s ease), box-shadow var(--transition-fast, 0.2s ease);
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  display: flex;
+  position: relative;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  box-shadow: var(--shadow-md, 0 1pt 3pt rgba(0,0,0,0.1));
+}
+
+.linesheet-preview-content .linesheet-product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg, 0 4px 12px rgba(0,0,0,0.15));
+}
+
+/* LANDSCAPE ORIENTATION - matches .product-card--landscape */
+.linesheet-preview-content .linesheet-product-card.landscape {
+  flex-direction: column;
+}
+
+.linesheet-preview-content .linesheet-product-card.landscape .product-image-container {
+  height: 65%;
+  width: 100%;
+}
+
+.linesheet-preview-content .linesheet-product-card.landscape .product-info {
+  height: 35%;
+  width: 100%;
+  padding: var(--linesheet-space-lg) var(--space-md);
+}
+
+/* PORTRAIT ORIENTATION - matches .product-card--portrait */
+.linesheet-preview-content .linesheet-product-card.portrait {
+  flex-direction: row;
+}
+
+.linesheet-preview-content .linesheet-product-card.portrait .product-image-container {
+  width: 65%; 
+  height: 100%;
+}
+
+.linesheet-preview-content .linesheet-product-card.portrait .product-info {
+  width: 35%; 
+  height: 100%;
+  padding: var(--linesheet-space-lg) var(--space-md);
+}
+
+/* SHARED STYLES FOR BOTH ORIENTATIONS */
+.linesheet-preview-content .product-image-container {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-secondary, #f8f8f8);
+  flex-shrink: 0;
+}
+
+.linesheet-preview-content .product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform var(--transition-normal, 0.3s ease);
+}
+
+.linesheet-preview-content .linesheet-product-card:hover .product-image {
+  transform: scale(1.05);
+}
+
+.linesheet-preview-content .product-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: var(--bg-primary, white);
+}
+
+.linesheet-preview-content .product-details {
+  flex-grow: 1;
+}
+
+.linesheet-preview-content .product-code {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary, #666);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-xs, 3pt);
+  font-family: 'Cardo', monospace;
+}
+
+.linesheet-preview-content .product-name {
+  font-weight: 600;
+  color: var(--text-primary, var(--linesheet-text-digital));
+  margin-bottom: var(--space-xs, 3pt);
+  line-height: 1.2;
+  font-size: 0.9rem;
+}
+
+/* PORTRAIT-SPECIFIC TYPOGRAPHY - matches .product-card--portrait .product-name */
+.linesheet-preview-content .linesheet-product-card.portrait .product-name {
+  font-size: 0.8rem;
+}
+
+.linesheet-preview-content .product-material {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #666);
+  margin-bottom: var(--space-sm, var(--linesheet-space-xs));
+  line-height: 1.3;
+}
+
+.linesheet-preview-content .product-price {
+  font-weight: 600;
+  color: var(--color-primary, var(--linesheet-brand-primary));
+  font-size: 1rem;
+  align-self: flex-end;
+  margin: 0;
+}
+
+/* PORTRAIT-SPECIFIC PRICING - matches .product-card--portrait .product-price */
+.linesheet-preview-content .linesheet-product-card.portrait .product-price {
+  font-size: 0.9rem;
+}
+
+.linesheet-preview-content .product-description {
+  font-size: 0.7rem;
+  color: #555;
+  line-height: 1.3;
+  margin: 2pt 0 0 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.catalog-footer {
+  height: 10%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+
+.page-number {
+  font-size: 10pt;
+  color: #666;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ===== RESPONSIVE LAYOUT ADJUSTMENTS ===== */
+
+.linesheet-product-card.portrait .product-image-container {
+  flex: 1.2;
+}
+
+.linesheet-product-card.landscape .product-image-container {
+  flex: 0.8;
+}
+
+/* ===== PRINT-SPECIFIC STYLES (for PDF export) ===== */
+
+@media print {
+  .linesheet-preview-content {
+    color: var(--linesheet-text-print) !important;
+    background-color: var(--linesheet-bg-print) !important;
+    width: 100% !important;
+    margin: 0 !important;
+    max-width: none !important;
+    box-shadow: none !important;
+  }
+  
+  .cover-page,
+  .table-of-contents,
+  .category-section {
+    width: 100% !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    padding: var(--paper-margin) !important;
+    border: none !important;
+    box-shadow: none !important;
+    page-break-after: always;
+    break-after: page;
+  }
+  
+  .linesheet-product-card {
+    box-shadow: none !important;
+    border: 1pt solid #ccc !important;
+  }
+  
+  .product-image {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+}
+
+/* ===== RESPONSIVE STYLES FOR SMALLER SCREENS ===== */
+
+@media screen and (max-width: 768px) {
+  .linesheet-preview-content {
+    width: 100%;
+    padding: var(--linesheet-space-md);
+  }
+  
+  .cover-page,
+  .table-of-contents,
+  .category-section {
+    width: 100%;
+    height: auto;
+    min-height: 100vh;
+    padding: var(--linesheet-space-lg);
+  }
+  
+  .product-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(4, 1fr);
+    gap: var(--linesheet-space-lg);
+    max-height: none;
+  }
+  
+  .brand-name {
+    font-size: 32pt;
+  }
+  
+  .category-title {
+    font-size: 16pt;
+  }
+  
+  .toc-header h2 {
+    font-size: 20pt;
+  }
+}
+
+/* ===== PREVIEW VISUAL ENHANCEMENT ===== */
+
+/* Add page indicators for preview */
+.cover-page::before {
+  content: "Cover Page";
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(59, 130, 246, 0.9);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 9pt;
+  font-weight: 500;
+  z-index: 10;
+}
+
+.table-of-contents::before {
+  content: "Table of Contents";
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(16, 185, 129, 0.9);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 9pt;
+  font-weight: 500;
+  z-index: 10;
+}
+
+.category-section::before {
+  content: "Catalog Page";
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(245, 158, 11, 0.9);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 9pt;
+  font-weight: 500;
+  z-index: 10;
+}
+
+.cover-page,
+.table-of-contents,
+.category-section {
+  position: relative;
+}
+
+/* ===== MINIMAL PRINT OVERRIDES (Add to end of linesheet-document.css) ===== */
+
+@media print {
+  /* 1. Force high-quality image rendering */
+  .product-image {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+  
+  /* 2. Ensure proper page breaks */
+  .category-section {
+    page-break-before: always !important;
+    break-before: page !important;
+  }
+  
+  /* 3. Prevent orphaned content */
+  .linesheet-product-card,
+  .toc-category {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  
+  /* 4. Optimize margins for professional printing */
+  .cover-page,
+  .table-of-contents,
+  .category-section {
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  
+  /* 5. Hide preview indicators for clean export */
+  .cover-page::before,
+  .table-of-contents::before,
+  .category-section::before {
+    display: none !important;
+  }
+}

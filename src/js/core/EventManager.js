@@ -1,5 +1,5 @@
 // js/core/EventManager.js
-// Event handling and UI interactions
+// Event handling and UI interactions - Updated for Phase 2.2
 
 export class EventManager {
   constructor(app) {
@@ -7,7 +7,7 @@ export class EventManager {
     this.setupEventListeners();
   }
 
-  // Event Setup (moved from main.js)
+  // Event Setup (enhanced for Phase 2.2)
   setupEventListeners() {
     // Airtable connection
     // Connection Controls
@@ -49,6 +49,8 @@ export class EventManager {
       settingsButton.addEventListener('click', () => this.showSettings());
     }
 
+    // PHASE 2.2: Enhanced Preview Controls
+
     // Preview Line Sheet button
     const previewButton = document.getElementById('preview-linesheet');
     if (previewButton) {
@@ -65,13 +67,17 @@ export class EventManager {
       });
     }
 
-    // Close Preview Panel button
-    const closePreviewButton = document.getElementById('close-preview-panel');
-    if (closePreviewButton) {
-      closePreviewButton.addEventListener('click', () => {
+    // Close Preview Panel button (dynamically added by PreviewManager)
+    // This will be handled by event delegation since the button is created dynamically
+    document.addEventListener('click', (e) => {
+      if (e.target.id === 'close-preview' || e.target.closest('#close-preview')) {
         this.app.previewManager.closePreviewPanel();
-      });
-    }
+      }
+      
+      if (e.target.id === 'print-preview' || e.target.closest('#print-preview')) {
+        this.app.previewManager.printPreview();
+      }
+    });
 
     // Configuration change listeners that trigger preview updates
     const configElements = [
@@ -88,13 +94,13 @@ export class EventManager {
       }
     });
 
-    console.log('✅ Event listeners set up successfully');
+    console.log('✅ Event listeners set up successfully (Phase 2.2 enhanced)');
   }
 
   // Settings (moved from main.js)
   showSettings() {
     // Placeholder for settings modal
-    this.app.notificationManager.showInfo('Settings panel will be implemented in Phase 2');
+    this.app.notificationManager.showInfo('Settings panel will be implemented in Phase 2.3');
   }
 }
 
