@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="styles/main.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Cardo:ital,wght@0,400;0,700;1,400&family=Sorts+Mill+Goudy:ital@0;1&display=swap" rel="stylesheet">
+    
+    <!-- Add PDF generation libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
     <!-- Header -->
@@ -100,35 +105,7 @@
                         </div>
                     </div>
 
-                    <div class="panel-section">
-                        <h2>Export Your Line Sheet</h2>
-                        <p>Generate professional catalogs in multiple formats.</p>
-                        
-                        <div class="export-controls">
-                            <button id="export-pdf" class="btn btn-primary" disabled>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                    <polyline points="14,2 14,8 20,8"></polyline>
-                                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                                    <polyline points="10,9 9,9 8,9"></polyline>
-                                </svg>
-                                Export PDF
-                            </button>
-                            
-                            <button id="export-markdown" class="btn btn-secondary" disabled>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                    <polyline points="14,2 14,8 20,8"></polyline>
-                                    <path d="M10 12h4"></path>
-                                    <path d="m12 10 2 2-2 2"></path>
-                                </svg>
-                                Export Markdown
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- NEW: Line Sheet Preview Controls -->
+                    <!-- MOVED: Line Sheet Preview Controls - Now THIRD -->
                     <div class="panel-section">
                         <h2>Line Sheet Preview</h2>
                         <p>Generate and preview your line sheet before exporting</p>
@@ -149,6 +126,25 @@
                                     <path d="M12 18v3"></path>
                                 </svg>
                                 Show Preview
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- MOVED: Export Controls - Now FOURTH, Markdown REMOVED -->
+                    <div class="panel-section">
+                        <h2>Export Your Line Sheet</h2>
+                        <p>Generate professional PDF catalog from your preview</p>
+                        
+                        <div class="export-controls">
+                            <button id="export-pdf" class="btn btn-primary" disabled>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14,2 14,8 20,8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10,9 9,9 8,9"></polyline>
+                                </svg>
+                                Export PDF
                             </button>
                         </div>
                     </div>
@@ -174,7 +170,7 @@
                 </div>
             </div>
 
-            <!-- NEW: Line Sheet Preview Panel -->
+            <!-- Line Sheet Preview Panel -->
             <div id="linesheet-preview-panel" class="preview-panel" style="display: none;">
                 <div class="preview-panel-header">
                     <h2>Line Sheet Preview</h2>

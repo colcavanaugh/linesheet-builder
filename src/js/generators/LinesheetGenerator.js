@@ -108,7 +108,7 @@ export class LinesheetGenerator {
       <p class="brand-tagline">Contemporary queer jewelry design</p>
       
       <div class="brand-statement">
-        <p>GiltyBoy is a contemporary fine jewelry brand founded in 2021 by Trevor Mock. Working from their studio in Tucson, Trevor combines traditional lost wax casting and metalsmithing techniques with modern design sensibilities to create pieces that are both meaningful and beautifully crafted. </p>
+        <p>GiltyBoy is a contemporary fine jewelry brand founded in 2021 by Trevor Mock. Working from their studio in Tucson, Trevor combines traditional lost wax casting and metalsmithing techniques with modern design to create pieces that are both meaningful and beautifully crafted. </p>
         <br>
         <p>The brand's signature collection transforms symbols of queer desire and sexuality into precious wearable art. Alongside these bold statement pieces, GiltyBoy offers a selection of classic, elegant designs that appeal to diverse audiences seeking exceptional handcrafted jewelry with timeless appeal.</p>
       </div>
@@ -172,7 +172,7 @@ export class LinesheetGenerator {
             <h2 class="category-title">${isFirstPage ? 'Table of Contents' : 'Table of Contents (continued)'}, page ${pageNum}</h2>
           </div>
           
-          <div class="catalog-body">
+          <div class="toc-body">
             <div class="toc-content">
               ${this.renderTOCItems(pageItems)}
             </div>
@@ -295,7 +295,11 @@ export class LinesheetGenerator {
             <span class="product-sku">${item.sku}</span>
             <span class="product-name" style="font-weight: 300; font-size: 0.8rem;">${item.name}</span>
             <span class="product-material">${item.material}</span>
-            <span class="product-wholesale-price">${item.price}</span>
+            <span class="product-price">
+              $${(Number(item.price) || 0) % 1 === 0 
+                  ? Number(item.price || 0) 
+                  : Number(item.price || 0).toFixed(2)}
+            </span>
           </div>
         `;
       }
@@ -439,8 +443,11 @@ export class LinesheetGenerator {
             <h4 class="product-name">${displayName}</h4>
             ${material ? `<p class="product-material">${material}</p>` : ''}
           </div>
-          <p class="product-price">${priceDisplay}</p>
-          ${description ? `<p class="product-description">${description}</p>` : ''}
+          <div class="product-price">
+            $${(Number(priceDisplay) || 0) % 1 === 0 
+                ? Number(priceDisplay || 0) 
+                : Number(priceDisplay || 0).toFixed(2)}
+          </div>
         </div>
       </div>
     `;
