@@ -3,7 +3,7 @@
   background: var(--bg-primary);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-md);
-  max-height: 1000px;
+  max-height: 720px;
   overflow-y: scroll;
 }
 

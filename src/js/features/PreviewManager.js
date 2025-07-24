@@ -63,6 +63,10 @@ export class PreviewManager {
       
       // Generate and show complete preview
       this.showLinesheetPreview();
+
+      if (this.app.exportManager) {
+        this.app.exportManager.updatePDFButtonState();
+      }
       
     } catch (error) {
       console.error('Error generating line sheet preview:', error);

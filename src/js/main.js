@@ -22,6 +22,10 @@ import NotificationManager from './ui/NotificationManager.js';
 // Generator modules
 import LinesheetGenerator from './generators/LinesheetGenerator.js';
 
+// Export modules
+import { PuppeteerGenerator } from './utils/pdf/PuppeteerGenerator.js';
+
+
 class LineSheetApp {
   constructor() {
     // Initialize core managers
@@ -43,6 +47,9 @@ class LineSheetApp {
     
     // Initialize event manager (must be last)
     this.eventManager = new EventManager(this);
+
+    // Initialize Puppeteer PDF generator
+    this.pdfGenerator = new PuppeteerGenerator();
     
     this.init();
   }
@@ -101,6 +108,30 @@ class LineSheetApp {
       ...this.stateManager.getDebugInfo(),
       cacheStats: this.airtableManager.airtableClient.getCacheStats()
     };
+  }
+
+  handlePuppeteerError(error) {
+    console.error('Puppeteer PDF generation error:', error);
+    
+    if (error.message.includes('Failed to launch')) {
+      this.notificationManager.showError(
+        'PDF generation service unavailable. Using alternative method...'
+      );
+      // Automatically switch to client-side method
+      this.exportManager.setExportMethod('client-side');
+    } else if (error.message.includes('timeout')) {
+      this.notificationManager.showError(
+        'PDF generation timed out. Please try with fewer products or simpler layout.'
+      );
+    } else if (error.message.includes('memory')) {
+      this.notificationManager.showError(
+        'Not enough memory for PDF generation. Using lower quality settings...'
+      );
+    } else {
+      this.notificationManager.showError(
+        'PDF generation failed. Please try again or use the basic export method.'
+      );
+    }
   }
 }
 

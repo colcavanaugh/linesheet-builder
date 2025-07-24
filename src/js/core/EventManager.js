@@ -63,13 +63,21 @@ export class EventManager {
       });
     }
 
-    // ENHANCED: Export Controls (now second in menu order, markdown removed)
-    const exportPdfButton = document.getElementById('export-pdf');
-    if (exportPdfButton) {
-      exportPdfButton.addEventListener('click', () => this.app.exportManager.exportPDF());
+    // PDF export button handler
+    const exportPDFButton = document.getElementById('export-pdf');
+    if (exportPDFButton) {
+      exportPDFButton.addEventListener('click', async () => {
+        await this.exportManager.exportPDF();
+      });
     }
 
-    // REMOVED: Export Markdown button event listener (no longer exists)
+    // Add export method selector (optional - for debugging/testing)
+    const exportMethodSelector = document.getElementById('export-method-selector');
+    if (exportMethodSelector) {
+      exportMethodSelector.addEventListener('change', (e) => {
+        this.exportManager.setExportMethod(e.target.value);
+      });
+    }
 
     // Settings
     const settingsButton = document.getElementById('settings-button');
