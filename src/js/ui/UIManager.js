@@ -30,6 +30,16 @@ export class UIManager {
     });
   }
 
+  /**
+   * Update loading message without changing loading state
+   */
+  updateLoadingMessage(message) {
+    const loadingMessage = document.getElementById('loading-message');
+    if (loadingMessage) {
+      loadingMessage.textContent = message;
+    }
+  }
+
   updateConnectionStatus(status) {
     const statusElement = document.getElementById('connection-status');
     if (!statusElement) return;

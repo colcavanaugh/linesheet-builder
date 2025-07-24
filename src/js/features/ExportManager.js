@@ -1,14 +1,18 @@
-// js/features/ExportManager.js
-// Export operations (PDF, Markdown, etc.) - Updated with client-side PDF export
+// src/js/features/ExportManager.js
+// Updated export manager that uses local PDF server
 
 import { getErrorMessage } from '../config/app.config.js';
+import { ClientPDFGenerator } from '../utils/pdf/ClientPDFGenerator.js';
 
 export class ExportManager {
   constructor(app) {
     this.app = app;
+    this.pdfGenerator = new ClientPDFGenerator();
   }
 
-  // Export Operations - Updated with working PDF export
+  /**
+   * Export PDF using Puppeteer via local server
+   */
   async exportPDF() {
     const state = this.app.stateManager.getState();
     if (state.products.length === 0) {
@@ -23,234 +27,129 @@ export class ExportManager {
       return;
     }
 
-    this.app.uiManager.updateLoadingState(true, 'Generating PDF...');
+    this.app.uiManager.updateLoadingState(true, 'Generating professional PDF with Puppeteer...');
     
     try {
-      await this.generateClientSidePDF();
-      this.app.notificationManager.showSuccess('PDF exported successfully!');
+      // Check if PDF server is running
+      const serverRunning = await this.pdfGenerator.isServerRunning();
+      
+      if (!serverRunning) {
+        this.app.notificationManager.showError(
+          'PDF server is not running. Please start the PDF server with: npm run pdf-server'
+        );
+        return;
+      }
+
+      // Get the complete HTML document from LinesheetGenerator
+      const linesheetHTML = this.app.linesheetGenerator.generateLinesheetHTML();
+      
+      console.log('🔄 Generating PDF with Puppeteer via local server...');
+      
+      // Generate PDF using the server
+      const pdfBuffer = await this.pdfGenerator.generatePDF(linesheetHTML);
+      
+      // Download the PDF
+      this.downloadPDF(pdfBuffer, this.generateFilename());
+      
+      this.app.notificationManager.showSuccess('Professional PDF exported successfully!');
       
     } catch (error) {
       console.error('PDF export failed:', error);
-      this.app.notificationManager.showError('Failed to generate PDF: ' + error.message);
+      
+      // Provide helpful error messages
+      if (error.message.includes('PDF server is not available')) {
+        this.app.notificationManager.showError(
+          'PDF Server Not Running: Please start the PDF server with "npm run pdf-server" in a separate terminal.'
+        );
+      } else if (error.message.includes('Server error')) {
+        this.app.notificationManager.showError(
+          'PDF Generation Failed: ' + error.message
+        );
+      } else {
+        this.app.notificationManager.showError(
+          'PDF export failed: ' + error.message
+        );
+      }
     } finally {
       this.app.uiManager.updateLoadingState(false);
     }
   }
 
   /**
-   * Generate PDF using client-side libraries (html2canvas + jsPDF)
+   * Download PDF buffer as file
+   * @param {ArrayBuffer} pdfBuffer - PDF data buffer
+   * @param {string} filename - Filename for download
    */
-  async generateClientSidePDF() {
-    // Check if required libraries are loaded
-    if (typeof window.html2canvas === 'undefined' || typeof window.jsPDF === 'undefined') {
-      throw new Error('PDF generation libraries not loaded. Please refresh the page and try again.');
-    }
-
-    // Get library references
-    const html2canvas = window.html2canvas;
-    const { jsPDF } = window.jsPDF;
-
-    const previewContent = document.getElementById('linesheet-preview-content');
-    if (!previewContent) {
-      throw new Error('Preview content not found');
-    }
-
-    // Get current timestamp for filename
-    const timestamp = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-    const filename = `Gilty-Boy-Linesheet-${timestamp}.pdf`;
-
-    // PDF configuration
-    const pdfConfig = {
-      orientation: 'portrait',
-      unit: 'mm',
-      format: 'a4',
-      compress: true
-    };
-
-    // html2canvas configuration for better quality
-    const canvasConfig = {
-      scale: 2, // Higher resolution
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#ffffff',
-      logging: false,
-      width: previewContent.scrollWidth,
-      height: previewContent.scrollHeight,
-      windowWidth: previewContent.scrollWidth,
-      windowHeight: previewContent.scrollHeight
-    };
-
-    try {
-      // Update loading message
-      this.app.uiManager.updateLoadingMessage('Capturing preview...');
-
-      // Temporarily modify styles for better PDF rendering
-      const originalStyles = this.prepareContentForPDF(previewContent);
-
-      // Generate canvas from preview content
-      const canvas = await html2canvas(previewContent, canvasConfig);
-
-      // Restore original styles
-      this.restoreContentStyles(previewContent, originalStyles);
-
-      // Update loading message
-      this.app.uiManager.updateLoadingMessage('Generating PDF...');
-
-      // Create PDF
-      const pdf = new jsPDF(pdfConfig);
-
-      // Calculate dimensions
-      const imgData = canvas.toDataURL('image/png', 1.0);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      
-      // Calculate scale to fit content to page width
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-      
-      const scaledWidth = imgWidth * ratio;
-      const scaledHeight = imgHeight * ratio;
-
-      // Check if content fits on one page
-      if (scaledHeight <= pdfHeight) {
-        // Single page - center content
-        const xOffset = (pdfWidth - scaledWidth) / 2;
-        const yOffset = (pdfHeight - scaledHeight) / 2;
-        pdf.addImage(imgData, 'PNG', xOffset, yOffset, scaledWidth, scaledHeight);
-      } else {
-        // Multiple pages - split content
-        await this.addMultiPageContent(pdf, imgData, scaledWidth, scaledHeight, pdfWidth, pdfHeight);
-      }
-
-      // Add metadata
-      pdf.setProperties({
-        title: `Gilty Boy Line Sheet - ${timestamp}`,
-        subject: 'Wholesale Product Catalog',
-        author: 'Gilty Boy',
-        creator: 'Gilty Boy Line Sheet Builder'
-      });
-
-      // Update loading message
-      this.app.uiManager.updateLoadingMessage('Downloading PDF...');
-
-      // Download the PDF
-      pdf.save(filename);
-
-    } catch (error) {
-      console.error('Error in PDF generation:', error);
-      throw new Error(`PDF generation failed: ${error.message}`);
-    }
-  }
-
-  /**
-   * Prepare content for better PDF rendering
-   */
-  prepareContentForPDF(element) {
-    const originalStyles = {};
+  downloadPDF(pdfBuffer, filename) {
+    const blob = new Blob([pdfBuffer], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
     
-    // Store original styles
-    originalStyles.width = element.style.width;
-    originalStyles.height = element.style.height;
-    originalStyles.overflow = element.style.overflow;
-    originalStyles.maxHeight = element.style.maxHeight;
-
-    // Temporarily modify for PDF
-    element.style.width = 'auto';
-    element.style.height = 'auto';
-    element.style.overflow = 'visible';
-    element.style.maxHeight = 'none';
-
-    // Apply PDF-friendly styles to child elements
-    const cards = element.querySelectorAll('.product-card, .linesheet-product-card');
-    cards.forEach(card => {
-      card.style.pageBreakInside = 'avoid';
-      card.style.display = 'block';
-      card.style.marginBottom = '20px';
-    });
-
-    return originalStyles;
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.style.display = 'none';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Clean up the object URL
+    setTimeout(() => URL.revokeObjectURL(url), 100);
   }
 
   /**
-   * Restore original content styles
+   * Generate filename for PDF export
+   * @returns {string} Generated filename
    */
-  restoreContentStyles(element, originalStyles) {
-    element.style.width = originalStyles.width;
-    element.style.height = originalStyles.height;
-    element.style.overflow = originalStyles.overflow;
-    element.style.maxHeight = originalStyles.maxHeight;
+  generateFilename() {
+    const state = this.app.stateManager.getState();
+    const brandName = state.config?.branding?.brandName || 'GiltyBoy';
+    const timestamp = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+    return `${brandName}-LineSheet-${timestamp}.pdf`;
   }
 
   /**
-   * Add content across multiple pages
+   * Check PDF server status for debugging
    */
-  async addMultiPageContent(pdf, imgData, scaledWidth, scaledHeight, pdfWidth, pdfHeight) {
-    const pageHeight = pdfHeight;
-    let currentY = 0;
-    let pageNumber = 1;
-
-    while (currentY < scaledHeight) {
-      if (pageNumber > 1) {
-        pdf.addPage();
-      }
-
-      const remainingHeight = scaledHeight - currentY;
-      const heightToAdd = Math.min(pageHeight, remainingHeight);
-
-      // Calculate source coordinates for cropping
-      const srcY = (currentY / scaledHeight) * (scaledHeight / (scaledWidth / pdfWidth));
-      const srcHeight = (heightToAdd / scaledHeight) * (scaledHeight / (scaledWidth / pdfWidth));
-
-      // Add image portion to current page
-      pdf.addImage(
-        imgData, 
-        'PNG', 
-        0, 
-        0, 
-        pdfWidth, 
-        heightToAdd,
-        undefined,
-        'FAST',
-        0,
-        -srcY
-      );
-
-      currentY += heightToAdd;
-      pageNumber++;
-
-      // Prevent infinite loop
-      if (pageNumber > 50) {
-        console.warn('PDF generation stopped after 50 pages to prevent infinite loop');
-        break;
-      }
-    }
+  async checkServerStatus() {
+    const status = await this.pdfGenerator.getServerStatus();
+    console.log('📊 PDF Server Status:', status);
+    return status;
   }
 
   /**
-   * Enable/disable PDF export button based on preview state
+   * Enable/disable PDF export button based on preview and server state
    */
-  updatePDFButtonState() {
+  async updatePDFButtonState() {
     const exportButton = document.getElementById('export-pdf');
     const previewContent = document.getElementById('linesheet-preview-content');
     
     if (exportButton) {
       const hasPreview = previewContent && previewContent.innerHTML.trim();
       const hasProducts = this.app.stateManager.getState().products.length > 0;
+      const serverRunning = await this.pdfGenerator.isServerRunning();
       
-      exportButton.disabled = !(hasPreview && hasProducts);
+      const canExport = hasPreview && hasProducts && serverRunning;
+      exportButton.disabled = !canExport;
       
-      if (hasPreview && hasProducts) {
-        exportButton.title = 'Export current preview as PDF';
+      if (canExport) {
+        exportButton.title = 'Export current preview as professional PDF';
       } else if (!hasProducts) {
         exportButton.title = 'Load products first';
-      } else {
+      } else if (!hasPreview) {
         exportButton.title = 'Generate preview first';
+      } else if (!serverRunning) {
+        exportButton.title = 'PDF server not running - start with "npm run pdf-server"';
       }
     }
   }
 
-  // Removed exportMarkdown method since markdown export was removed
+  /**
+   * Cleanup resources
+   */
+  async cleanup() {
+    // No cleanup needed for client-side generator
+  }
 }
 
 export default ExportManager;

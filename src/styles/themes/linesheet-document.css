@@ -346,12 +346,10 @@
 
 /* LINESHEET-SPECIFIC PRODUCT CARDS - inherit from existing product-card styles */
 .linesheet-preview-content .linesheet-product-card {
-  /* Inherit all product-card styles */
   background: var(--bg-primary, white);
   border: 1px solid var(--border-color, #ddd);
   border-radius: 3pt;
   overflow: hidden;
-  transition: transform var(--transition-fast, 0.2s ease), box-shadow var(--transition-fast, 0.2s ease);
   aspect-ratio: 1 / 1;
   width: 100%;
   display: flex;
@@ -363,7 +361,7 @@
 
 .linesheet-preview-content .linesheet-product-card:hover {
   /* transform: translateY(-2px); */
-  box-shadow: var(--shadow-lg, 0 4px 12px rgba(0,0,0,0.15));
+  /* box-shadow: var(--shadow-lg, 0 4px 12px rgba(0,0,0,0.15)); */
 }
 
 /* LANDSCAPE ORIENTATION - matches .product-card--landscape */
@@ -395,6 +393,7 @@
 
 /* PORTRAIT ORIENTATION - matches .product-card--portrait */
 .linesheet-preview-content .linesheet-product-card.portrait {
+  display: flex !important;
   flex-direction: row;
 }
 
@@ -426,7 +425,7 @@
 }
 
 .linesheet-preview-content .linesheet-product-card:hover .product-image {
-  transform: scale(1.05);
+  /* transform: scale(1.05); */
 }
 
 .linesheet-preview-content .product-info {
@@ -509,37 +508,52 @@
 
 /* ===== PRINT-SPECIFIC STYLES (for PDF export) ===== */
 
+/* Puppeteer-specific optimizations */
 @media print {
-  .linesheet-preview-content {
-    color: var(--linesheet-text-print) !important;
-    background-color: var(--linesheet-bg-print) !important;
-    width: 100% !important;
-    margin: 0 !important;
-    max-width: none !important;
-    box-shadow: none !important;
-  }
-  
-  .cover-page,
-  .table-of-contents,
-  .category-section {
-    width: 100% !important;
-    height: 100vh !important;
-    margin: 0 !important;
-    padding: var(--paper-margin) !important;
-    border: none !important;
-    box-shadow: none !important;
-    page-break-after: always;
-    break-after: page;
-  }
-  
-  .linesheet-product-card {
-    box-shadow: none !important;
-    border: 1pt solid #ccc !important;
-  }
-  
+  /* Force high-quality image rendering */
   .product-image {
     -webkit-print-color-adjust: exact !important;
     color-adjust: exact !important;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    print-color-adjust: exact;
+  }
+  
+  /* Ensure proper page breaks */
+  .category-section {
+    page-break-before: always !important;
+    break-before: page !important;
+  }
+  
+  .cover-page {
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+  
+  .table-of-contents {
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+  
+  /* Prevent content splitting across pages */
+  .linesheet-product-card,
+  .toc-category {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  
+  /* Optimize text rendering */
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  
+  /* Remove preview-only elements */
+  .cover-page::before,
+  .table-of-contents::before,
+  .category-section::before {
+    display: none !important;
   }
 }
 

@@ -7,15 +7,17 @@ A comprehensive guide for starting, managing, and ending development sessions.
 - [🚀 Starting a Development Session](#-starting-a-development-session)
   - [Pre-Development Checklist](#pre-development-checklist)
   - [Environment Setup](#environment-setup)
-  - [Starting the Development Server](#starting-the-development-server)
+  - [Starting the Development Servers](#starting-the-development-servers)
   - [Initial Connection Test](#initial-connection-test)
 - [🛠️ Development Commands](#️-development-commands)
   - [Core Development](#core-development)
+  - [PDF Server Management](#pdf-server-management)
   - [Code Quality](#code-quality)
   - [Testing Commands](#testing-commands)
   - [Build and Preview](#build-and-preview)
 - [🔍 Debugging and Troubleshooting](#-debugging-and-troubleshooting)
   - [Connection Issues](#connection-issues)
+  - [PDF Generation Issues](#pdf-generation-issues)
   - [Development Tools](#development-tools)
   - [Cache Management](#cache-management)
   - [Performance Monitoring](#performance-monitoring)
@@ -23,6 +25,10 @@ A comprehensive guide for starting, managing, and ending development sessions.
   - [Connection Testing](#connection-testing)
   - [Data Validation](#data-validation)
   - [Line Sheet Organization](#line-sheet-organization)
+- [📄 PDF Export Testing](#-pdf-export-testing)
+  - [Server Status Checks](#server-status-checks)
+  - [PDF Quality Testing](#pdf-quality-testing)
+  - [Troubleshooting PDF Issues](#troubleshooting-pdf-issues)
 - [📊 Monitoring and Analytics](#-monitoring-and-analytics)
   - [Real-time Monitoring](#real-time-monitoring)
   - [Performance Metrics](#performance-metrics)
@@ -57,7 +63,7 @@ A comprehensive guide for starting, managing, and ending development sessions.
 Before starting any development work, run through this checklist:
 
 ```bash
-# Check Node.js version (should be >= 16.0.0)
+# Check Node.js version (should be >= 18.0.0 for Puppeteer)
 node --version
 
 # Check npm version (should be >= 8.0.0)
@@ -68,6 +74,9 @@ git status
 
 # Check if environment file exists
 ls -la .env
+
+# Verify PDF server directory exists
+ls -la server/
 ```
 
 ### Environment Setup
@@ -89,7 +98,20 @@ cat .env
 # NODE_ENV=development
 ```
 
-**3. Install/Update Dependencies (if needed):**
+**3. Verify PDF Server Setup:**
+```bash
+# Check PDF server exists
+ls -la server/pdf-server.js
+
+# Check Puppeteer is installed
+npm list puppeteer
+
+# Verify ports are available
+lsof -i :5173  # Vite dev server
+lsof -i :3001  # PDF server
+```
+
+**4. Install/Update Dependencies (if needed):**
 ```bash
 # Only run if package.json has changed or node_modules is missing
 npm install
@@ -98,32 +120,61 @@ npm install
 npm outdated
 ```
 
-### Starting the Development Server
+### Starting the Development Servers
 
-**Primary Development Command:**
+**🎯 Recommended: Start Both Servers Together**
 ```bash
-# Start the development server (opens automatically in browser)
+# Start both Vite dev server AND PDF server simultaneously
+npm run dev-all
+
+# Expected output:
+# [0] 
+# [0]   VITE v4.5.3  ready in 234 ms
+# [0] 
+# [0]   ➜  Local:   http://localhost:5173/
+# [0]   ➜  Network: use --host to expose
+# [1] 🚀 PDF Server running on http://localhost:3001
+# [1] 📄 Ready to generate PDFs with Puppeteer
+# [1] ✅ Puppeteer browser launched
+```
+
+**Alternative: Start Servers Separately**
+
+*Terminal 1 - Main Development Server:*
+```bash
+# Start the Vite development server
 npm run dev
 
-# Alternative: Start without auto-opening browser
-npm run dev -- --open false
-
-# Start on different port
-npm run dev -- --port 3001
+# Expected output:
+#   VITE v4.5.3  ready in 234 ms
+#   ➜  Local:   http://localhost:5173/
 ```
 
-**Expected Output:**
-```
-  VITE v4.5.3  ready in 234 ms
+*Terminal 2 - PDF Generation Server:*
+```bash
+# Start the PDF server (required for PDF export)
+npm run pdf-server
 
-  ➜  Local:   http://localhost:3000/
-  ➜  Network: use --host to expose
-  ➜  press h to show help
+# Expected output:
+# 🚀 PDF Server running on http://localhost:3001
+# 📄 Ready to generate PDFs with Puppeteer
+# ✅ Puppeteer browser launched
+```
+
+**Server Status Verification:**
+```bash
+# Check both servers are running
+curl http://localhost:5173  # Should return HTML
+curl http://localhost:3001/api/health  # Should return {"status":"ok"}
+
+# Check processes
+ps aux | grep node
+# Should show both Vite and PDF server processes
 ```
 
 ### Initial Connection Test
 
-**Browser Console Commands:**
+**Browser Console Commands (after opening http://localhost:5173):**
 ```javascript
 // Test environment setup
 DevHelpers.checkEnvironmentSetup()
@@ -133,6 +184,9 @@ DevHelpers.testAirtableConnection()
 
 // Load and validate your ring data
 DevHelpers.testGiltyBoyData()
+
+// Test PDF server connection
+window.app.exportManager.checkServerStatus()
 
 // Run comprehensive test suite
 DevHelpers.runFullTest()
@@ -144,10 +198,16 @@ DevHelpers.runFullTest()
 
 ### Core Development
 
-**Development Server:**
+**Development Server Management:**
 ```bash
-# Start development server
+# Start both servers (recommended)
+npm run dev-all
+
+# Start only Vite dev server
 npm run dev
+
+# Start only PDF server
+npm run pdf-server
 
 # Start with specific host (accessible from other devices)
 npm run dev -- --host
@@ -156,13 +216,41 @@ npm run dev -- --host
 DEBUG=vite:* npm run dev
 ```
 
-**File Watching:**
-```bash
-# Watch and auto-restart on file changes (if using nodemon)
-npm run dev:watch
+### PDF Server Management
 
-# Watch specific file types
-npm run dev -- --watch "**/*.{js,css,html}"
+**PDF Server Commands:**
+```bash
+# Start PDF server
+npm run pdf-server
+
+# Start PDF server with debug logging
+DEBUG=pdf-server npm run pdf-server
+
+# Check PDF server status
+curl http://localhost:3001/api/health
+
+# Test PDF generation endpoint
+curl -X POST http://localhost:3001/api/generate-pdf \
+  -H "Content-Type: application/json" \
+  -d '{"html":"<html><body>Test</body></html>"}'
+
+# Kill PDF server if hung
+pkill -f "pdf-server"
+
+# Restart PDF server (if running separately)
+pkill -f "pdf-server" && npm run pdf-server
+```
+
+**PDF Server Health Monitoring:**
+```javascript
+// In browser console - check server status
+window.app.exportManager.checkServerStatus()
+
+// Monitor server health every 30 seconds
+setInterval(async () => {
+  const status = await window.app.exportManager.checkServerStatus()
+  console.log('PDF Server Status:', status)
+}, 30000)
 ```
 
 ### Code Quality
@@ -176,7 +264,7 @@ npm run lint
 npm run lint:fix
 
 # Lint specific files
-npx eslint src/js/main.js
+npx eslint src/js/main.js server/pdf-server.js
 
 # Lint with different formats
 npm run lint -- --format table
@@ -184,14 +272,14 @@ npm run lint -- --format table
 
 **Code Formatting:**
 ```bash
-# Format all code files
+# Format all code files (including server files)
 npm run format
 
 # Format specific files
-npx prettier --write src/js/main.js
+npx prettier --write src/js/main.js server/pdf-server.js
 
 # Check formatting without fixing
-npx prettier --check "src/**/*.{js,css,md}"
+npx prettier --check "src/**/*.{js,css,md}" "server/**/*.js"
 ```
 
 ### Testing Commands
@@ -207,23 +295,11 @@ npm test -- --watch
 # Run specific test file
 npm test -- airtable.test.js
 
+# Run PDF-related tests
+npm test -- pdf.test.js
+
 # Run tests with coverage
 npm test -- --coverage
-
-# Run tests matching pattern
-npm test -- --grep "Airtable"
-```
-
-**End-to-End Testing:**
-```bash
-# Run E2E tests
-npm run test:e2e
-
-# Run E2E tests in headed mode (see browser)
-npm run test:e2e -- --headed
-
-# Run specific E2E test
-npm run test:e2e -- --grep "connection"
 ```
 
 ### Build and Preview
@@ -247,6 +323,8 @@ npm run preview
 
 # Preview on different port
 npm run preview -- --port 4173
+
+# Note: PDF server still needed for PDF exports in preview mode
 ```
 
 ---
@@ -269,20 +347,47 @@ echo $VITE_AIRTABLE_ACCESS_TOKEN | cut -c1-3
 # Should output: pat
 ```
 
-**Browser Console Debugging:**
+### PDF Generation Issues
+
+**PDF Server Troubleshooting:**
+```bash
+# Check if PDF server is running
+curl http://localhost:3001/api/health
+
+# Check server logs
+# Look at terminal running npm run pdf-server
+
+# Test PDF generation manually
+curl -X POST http://localhost:3001/api/generate-pdf \
+  -H "Content-Type: application/json" \
+  -d '{"html":"<html><body><h1>Test PDF</h1></body></html>"}' \
+  --output test.pdf
+
+# Check for port conflicts
+lsof -i :3001
+
+# Kill processes using port 3001
+lsof -ti:3001 | xargs kill -9
+```
+
+**Browser Console PDF Debugging:**
 ```javascript
-// Check application state
-window.app.getDebugInfo()
+// Check PDF server connection
+await window.app.exportManager.pdfGenerator.isServerRunning()
 
-// Clear application cache
-window.app.airtableClient.clearCache()
+// Get detailed server status
+await window.app.exportManager.checkServerStatus()
 
-// Test specific product loading
-window.app.airtableClient.getProducts().then(console.log)
+// Test PDF generation with current preview
+const html = window.app.linesheetGenerator.generateLinesheetHTML()
+console.log('HTML length:', html.length)
 
-// Check for JavaScript errors
-console.clear()
-// Then reproduce the issue and check console
+// Debug export manager state
+console.log('Export Manager:', {
+  hasPreview: !!document.getElementById('linesheet-preview-content')?.innerHTML.trim(),
+  hasProducts: window.app.stateManager.getState().products.length,
+  serverURL: window.app.exportManager.pdfGenerator.serverURL
+})
 ```
 
 ### Development Tools
@@ -299,13 +404,17 @@ rm -rf node_modules/.vite
 npm run dev -- --force
 ```
 
-**Browser DevTools Shortcuts:**
-- `F12` - Open DevTools
-- `Ctrl+Shift+C` - Inspect element
-- `Ctrl+Shift+I` - Toggle DevTools
-- `Ctrl+Shift+J` - Console tab
-- `Ctrl+R` - Refresh page
-- `Ctrl+Shift+R` - Hard refresh (ignore cache)
+**Server Process Management:**
+```bash
+# List all Node processes
+ps aux | grep node
+
+# Kill all Node processes (nuclear option)
+pkill -f node
+
+# Restart everything
+npm run dev-all
+```
 
 ### Cache Management
 
@@ -317,6 +426,12 @@ npm cache clean --force
 # Clear Vite cache
 rm -rf node_modules/.vite
 
+# Clear Puppeteer cache
+rm -rf .cache/puppeteer
+
+# Re-download Puppeteer
+npm run setup-pdf
+
 # Clear browser cache (programmatically)
 # In browser console:
 caches.keys().then(names => names.forEach(name => caches.delete(name)))
@@ -327,23 +442,146 @@ localStorage.clear()
 sessionStorage.clear()
 ```
 
-### Performance Monitoring
+---
 
-**Monitor Development Performance:**
-```bash
-# Analyze bundle size
-npm run build -- --analyze
+## 📄 PDF Export Testing
 
-# Check load times
-time npm run dev
+### Server Status Checks
 
-# Monitor file changes
-# In browser console:
-performance.mark('dev-start')
-// Do some actions
-performance.mark('dev-end')
-performance.measure('dev-duration', 'dev-start', 'dev-end')
-console.log(performance.getEntriesByType('measure'))
+**Verify PDF Infrastructure:**
+```javascript
+// In browser console - comprehensive PDF system check
+const pdfSystemCheck = async () => {
+  console.log('🔍 PDF System Check:')
+  
+  // 1. Server availability
+  const serverRunning = await window.app.exportManager.pdfGenerator.isServerRunning()
+  console.log('- PDF Server Running:', serverRunning)
+  
+  // 2. Server health
+  const serverStatus = await window.app.exportManager.checkServerStatus()
+  console.log('- Server Status:', serverStatus)
+  
+  // 3. Preview content
+  const hasPreview = !!document.getElementById('linesheet-preview-content')?.innerHTML.trim()
+  console.log('- Has Preview Content:', hasPreview)
+  
+  // 4. Product data
+  const productCount = window.app.stateManager.getState().products.length
+  console.log('- Product Count:', productCount)
+  
+  // 5. HTML generation test
+  try {
+    const html = window.app.linesheetGenerator.generateLinesheetHTML()
+    console.log('- HTML Generation: ✅ Success, length:', html.length)
+  } catch (error) {
+    console.log('- HTML Generation: ❌ Failed -', error.message)
+  }
+  
+  return { serverRunning, hasPreview, productCount }
+}
+
+// Run the check
+pdfSystemCheck()
+```
+
+### PDF Quality Testing
+
+**Test PDF Generation Process:**
+```javascript
+// Test minimal PDF generation
+const testMinimalPDF = async () => {
+  const testHTML = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <style>
+          body { font-family: Arial; margin: 1in; }
+          .test { page-break-after: always; }
+        </style>
+      </head>
+      <body>
+        <div class="test">
+          <h1>Test PDF Page 1</h1>
+          <p>This is a test PDF generation.</p>
+        </div>
+        <div>
+          <h1>Test PDF Page 2</h1>
+          <p>This is page 2 of the test.</p>
+        </div>
+      </body>
+    </html>
+  `
+  
+  try {
+    const pdfBuffer = await window.app.exportManager.pdfGenerator.generatePDF(testHTML)
+    console.log('✅ Minimal PDF test successful, size:', pdfBuffer.byteLength, 'bytes')
+    
+    // Download test PDF
+    const blob = new Blob([pdfBuffer], { type: 'application/pdf' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'test-pdf.pdf'
+    link.click()
+    URL.revokeObjectURL(url)
+    
+  } catch (error) {
+    console.error('❌ Minimal PDF test failed:', error)
+  }
+}
+
+// Run minimal test
+testMinimalPDF()
+```
+
+### Troubleshooting PDF Issues
+
+**Common PDF Problems and Solutions:**
+
+```javascript
+// Problem: "PDF server not running"
+// Solution check:
+const fixServerIssue = async () => {
+  console.log('🔧 Checking PDF server issue...')
+  
+  // Check if server is actually running
+  try {
+    const response = await fetch('http://localhost:3001/api/health')
+    if (response.ok) {
+      console.log('✅ Server is running but app thinks it\'s not')
+      console.log('Try refreshing the page')
+    }
+  } catch (error) {
+    console.log('❌ Server is actually not running')
+    console.log('Start server with: npm run pdf-server')
+  }
+}
+
+// Problem: PDF generation fails
+// Debug the HTML content:
+const debugPDFContent = () => {
+  try {
+    const html = window.app.linesheetGenerator.generateLinesheetHTML()
+    console.log('📄 Generated HTML preview:')
+    console.log('Length:', html.length)
+    console.log('Contains images:', html.includes('<img'))
+    console.log('Contains CSS:', html.includes('<style>') || html.includes('<link'))
+    
+    // Check for problematic content
+    if (html.includes('undefined')) {
+      console.warn('⚠️ HTML contains "undefined" - check data validation')
+    }
+    if (html.length < 1000) {
+      console.warn('⚠️ HTML seems too short - might be missing content')
+    }
+  } catch (error) {
+    console.error('❌ HTML generation failed:', error)
+  }
+}
+
+fixServerIssue()
+debugPDFContent()
 ```
 
 ---
@@ -354,7 +592,7 @@ console.log(performance.getEntriesByType('measure'))
 
 **Basic Connection Tests:**
 ```javascript
-// In browser console after npm run dev
+// In browser console after npm run dev-all
 
 // 1. Test environment setup
 DevHelpers.checkEnvironmentSetup()
@@ -364,21 +602,31 @@ DevHelpers.testAirtableConnection()
 
 // 3. Load product data
 DevHelpers.loadTestData()
-```
 
-**Advanced Connection Testing:**
-```javascript
-// Test specific endpoints
-fetch('https://api.airtable.com/v0/appmDNXTcMaDH4rPF/Products?maxRecords=1', {
-  headers: {
-    'Authorization': 'Bearer ' + import.meta.env.VITE_AIRTABLE_ACCESS_TOKEN
+// 4. Test complete workflow including PDF
+const testFullWorkflow = async () => {
+  console.log('🔄 Testing complete workflow...')
+  
+  // Load products
+  await window.app.productManager.loadProducts()
+  console.log('✅ Products loaded')
+  
+  // Generate preview
+  await window.app.previewManager.handlePreviewLinesheet()
+  console.log('✅ Preview generated')
+  
+  // Check PDF server
+  const serverOk = await window.app.exportManager.pdfGenerator.isServerRunning()
+  console.log('PDF Server Ready:', serverOk)
+  
+  if (serverOk) {
+    console.log('✅ Complete workflow ready - try PDF export!')
+  } else {
+    console.log('❌ Start PDF server: npm run pdf-server')
   }
-}).then(r => r.json()).then(console.log)
-
-// Test rate limiting
-for(let i = 0; i < 10; i++) {
-  DevHelpers.testAirtableConnection().then(r => console.log(`Test ${i+1}:`, r))
 }
+
+testFullWorkflow()
 ```
 
 ### Data Validation
@@ -388,20 +636,30 @@ for(let i = 0; i < 10; i++) {
 // Test your specific ring collection
 DevHelpers.testGiltyBoyData()
 
-// Validate individual products
+// Enhanced product validation including PDF readiness
 window.app.airtableClient.getProducts().then(products => {
+  console.log('📊 Product Analysis for PDF Generation:')
+  
+  let validProducts = 0
+  let missingImages = 0
+  let missingPrices = 0
+  
   products.forEach(product => {
     const validation = window.app.validator.validateProduct(product)
-    if (!validation.isValid) {
-      console.error('Invalid product:', product.productCode, validation.errors)
+    if (validation.isValid) {
+      validProducts++
+    } else {
+      console.warn('Invalid product:', product.productCode, validation.errors)
     }
+    
+    if (product.images.length === 0) missingImages++
+    if (!product.wholesalePrice || product.wholesalePrice <= 0) missingPrices++
   })
-})
-
-// Check for missing images
-window.app.airtableClient.getProducts().then(products => {
-  const noImages = products.filter(p => p.images.length === 0)
-  console.log('Products without images:', noImages.map(p => p.productCode))
+  
+  console.log(`Valid products: ${validProducts}/${products.length}`)
+  console.log(`Missing images: ${missingImages}`)
+  console.log(`Missing prices: ${missingPrices}`)
+  console.log(`PDF-ready products: ${validProducts - missingImages}`)
 })
 ```
 
@@ -409,22 +667,18 @@ window.app.airtableClient.getProducts().then(products => {
 
 **Test Organization Logic:**
 ```javascript
-// Test line sheet organization
+// Test line sheet organization for PDF
 window.app.airtableClient.getProducts().then(products => {
   const organized = LineSheetOrganizer.organizeGiltyBoyProducts(products)
-  console.log('Line Sheet Structure:', organized)
-  console.log('Table of Contents:', organized.tableOfContents)
-  console.log('Summary:', organized.summary)
-})
-
-// Test price calculations
-window.app.airtableClient.getProducts().then(products => {
-  const prices = products.map(p => p.wholesalePrice).filter(p => p > 0)
-  console.log('Price Range:', {
-    min: Math.min(...prices),
-    max: Math.max(...prices),
-    average: prices.reduce((a,b) => a+b, 0) / prices.length,
-    total: prices.reduce((a,b) => a+b, 0)
+  console.log('📋 Line Sheet Structure for PDF:')
+  console.log('- Categories:', Object.keys(organized.categories).length)
+  console.log('- Total products:', organized.summary.totalProducts)
+  console.log('- Page estimate:', Math.ceil(organized.summary.totalProducts / 8), 'pages')
+  console.log('- Price range: $', organized.summary.priceRange.min, '-', organized.summary.priceRange.max)
+  
+  // Test each category for PDF layout
+  Object.entries(organized.categories).forEach(([categoryName, category]) => {
+    console.log(`- ${categoryName}: ${category.products.length} products`)
   })
 })
 ```
@@ -435,222 +689,57 @@ window.app.airtableClient.getProducts().then(products => {
 
 ### Real-time Monitoring
 
-**Monitor Application State:**
+**Monitor Both Servers:**
 ```javascript
-// Set up real-time monitoring (in browser console)
-setInterval(() => {
+// Enhanced monitoring including PDF server
+setInterval(async () => {
   const stats = {
     timestamp: new Date().toISOString(),
-    products: window.app?.state?.products?.length || 0,
-    cacheSize: window.app?.airtableClient?.getCacheStats()?.size || 0,
-    errors: document.querySelectorAll('.notification-error').length
+    viteApp: {
+      products: window.app?.state?.products?.length || 0,
+      cacheSize: window.app?.airtableClient?.getCacheStats()?.size || 0,
+      errors: document.querySelectorAll('.notification-error').length
+    },
+    pdfServer: {
+      running: await window.app.exportManager.pdfGenerator.isServerRunning(),
+      serverURL: window.app.exportManager.pdfGenerator.serverURL
+    }
   }
-  console.log('App Stats:', stats)
-}, 30000) // Every 30 seconds
-```
-
-**Network Monitoring:**
-```javascript
-// Monitor API calls
-const originalFetch = window.fetch
-window.fetch = function(...args) {
-  console.log('API Call:', args[0])
-  return originalFetch.apply(this, arguments)
-    .then(response => {
-      console.log('API Response:', response.status, args[0])
-      return response
-    })
-}
+  console.log('📊 System Stats:', stats)
+}, 60000) // Every 60 seconds
 ```
 
 ### Performance Metrics
 
-**Measure Performance:**
+**Measure PDF Generation Performance:**
 ```javascript
-// Measure page load time
-console.log('Page Load Time:', performance.timing.loadEventEnd - performance.timing.navigationStart, 'ms')
+// Measure full PDF generation time
+const measurePDFPerformance = async () => {
+  console.time('full-pdf-generation')
+  
+  try {
+    // Measure HTML generation
+    console.time('html-generation')
+    const html = window.app.linesheetGenerator.generateLinesheetHTML()
+    console.timeEnd('html-generation')
+    
+    // Measure PDF server processing
+    console.time('pdf-server-processing')
+    const pdfBuffer = await window.app.exportManager.pdfGenerator.generatePDF(html)
+    console.timeEnd('pdf-server-processing')
+    
+    console.log('📊 PDF Performance:')
+    console.log('- HTML size:', html.length, 'characters')
+    console.log('- PDF size:', pdfBuffer.byteLength, 'bytes')
+    
+  } catch (error) {
+    console.error('Performance test failed:', error)
+  } finally {
+    console.timeEnd('full-pdf-generation')
+  }
+}
 
-// Measure Airtable fetch time
-console.time('airtable-fetch')
-window.app.airtableClient.getProducts().then(() => {
-  console.timeEnd('airtable-fetch')
-})
-
-// Measure component render time
-console.time('product-grid-render')
-window.app.renderProductGrid()
-console.timeEnd('product-grid-render')
-```
-
-### Error Tracking
-
-**Track and Log Errors:**
-```javascript
-// Set up error tracking
-window.addEventListener('error', (e) => {
-  console.error('Global Error:', {
-    message: e.message,
-    filename: e.filename,
-    line: e.lineno,
-    column: e.colno,
-    stack: e.error?.stack
-  })
-})
-
-// Track unhandled promise rejections
-window.addEventListener('unhandledrejection', (e) => {
-  console.error('Unhandled Promise Rejection:', e.reason)
-})
-```
-
----
-
-## 🔄 Version Control Workflow
-
-### Git Commands
-
-**Daily Git Workflow:**
-```bash
-# Check current status
-git status
-
-# See what changed
-git diff
-
-# Stage changes
-git add .
-# Or stage specific files
-git add src/js/main.js
-
-# Commit with descriptive message
-git commit -m "feat: add line sheet organization for ring products"
-
-# Push to remote
-git push origin main
-```
-
-**Git Best Practices:**
-```bash
-# Create feature branch
-git checkout -b feature/pdf-export
-
-# Switch branches
-git checkout main
-git checkout feature/pdf-export
-
-# Merge feature back to main
-git checkout main
-git merge feature/pdf-export
-
-# Delete merged branch
-git branch -d feature/pdf-export
-```
-
-### Branch Management
-
-**Branch Workflow:**
-```bash
-# List all branches
-git branch -a
-
-# Create and switch to new branch
-git checkout -b feature/new-feature
-
-# Push new branch to remote
-git push -u origin feature/new-feature
-
-# Pull latest changes
-git pull origin main
-
-# Rebase current branch on main
-git rebase main
-```
-
-### Commit Best Practices
-
-**Commit Message Format:**
-```bash
-# Feature additions
-git commit -m "feat: add product image display"
-
-# Bug fixes
-git commit -m "fix: resolve Airtable connection timeout"
-
-# Documentation
-git commit -m "docs: update development session guide"
-
-# Code refactoring
-git commit -m "refactor: reorganize component structure"
-
-# Performance improvements
-git commit -m "perf: optimize product data loading"
-```
-
----
-
-## 📦 Dependency Management
-
-### Installing Dependencies
-
-**Add New Dependencies:**
-```bash
-# Add production dependency
-npm install package-name
-
-# Add development dependency
-npm install --save-dev package-name
-
-# Install specific version
-npm install package-name@1.2.3
-
-# Install from GitHub
-npm install user/repo#branch
-```
-
-**Verify Installation:**
-```bash
-# Check installed packages
-npm list --depth=0
-
-# Check for peer dependency warnings
-npm install
-
-# Verify package in package.json
-cat package.json | grep package-name
-```
-
-### Updating Dependencies
-
-**Update Packages:**
-```bash
-# Check for outdated packages
-npm outdated
-
-# Update all packages to latest compatible versions
-npm update
-
-# Update specific package
-npm update package-name
-
-# Update to latest major version (be careful!)
-npm install package-name@latest
-```
-
-### Security Audits
-
-**Security Commands:**
-```bash
-# Check for vulnerabilities
-npm audit
-
-# Fix automatically fixable vulnerabilities
-npm audit fix
-
-# Force fix (may introduce breaking changes)
-npm audit fix --force
-
-# Get detailed vulnerability report
-npm audit --json
+measurePDFPerformance()
 ```
 
 ---
@@ -664,69 +753,55 @@ npm audit --json
 # 1. Check for unsaved changes
 git status
 
-# 2. Run final tests
+# 2. Test both servers are working
+curl http://localhost:5173
+curl http://localhost:3001/api/health
+
+# 3. Run final tests
 npm run lint
 npm test
 
-# 3. Commit any work in progress
+# 4. Test PDF export functionality
+# (in browser: load products, generate preview, export PDF)
+
+# 5. Commit any work in progress
 git add .
 git commit -m "wip: save progress on [feature name]"
 
-# 4. Push to remote (backup)
+# 6. Push to remote (backup)
 git push origin main
-```
-
-### Saving Work
-
-**Save Current State:**
-```bash
-# Create a snapshot of current work
-git stash save "Work in progress on $(date)"
-
-# Save with description
-git stash save "Debugging Airtable connection issues"
-
-# List all stashes
-git stash list
-
-# Apply stash later
-git stash apply stash@{0}
-```
-
-**Backup Important Files:**
-```bash
-# Backup configuration
-cp .env .env.backup.$(date +%Y%m%d)
-
-# Backup any custom modifications
-tar -czf backup-$(date +%Y%m%d).tar.gz src/ docs/ *.md *.json
 ```
 
 ### Cleanup Commands
 
+**Stop All Servers:**
+```bash
+# If using npm run dev-all, press Ctrl+C once to stop both
+
+# Or stop individually:
+# Ctrl+C in terminal running npm run dev
+# Ctrl+C in terminal running npm run pdf-server
+
+# Force kill if needed
+pkill -f "vite"
+pkill -f "pdf-server"
+
+# Verify all processes stopped
+ps aux | grep node
+```
+
 **Clean Up Development Environment:**
 ```bash
-# Stop the development server (Ctrl+C in terminal)
-
 # Clean temporary files
 rm -rf .tmp
 rm -rf *.log
+rm -rf test*.pdf  # Clean up test PDFs
 
-# Optional: Clean node_modules to save space
-# (only if you won't be developing again soon)
-# rm -rf node_modules
+# Optional: Clean Puppeteer cache to save space
+# rm -rf .cache/puppeteer
 
 # Clean Git working directory
 git clean -fd
-```
-
-**Close Applications:**
-```bash
-# Kill any remaining Node processes (if needed)
-pkill -f node
-
-# Check for running processes
-ps aux | grep node
 ```
 
 ---
@@ -735,71 +810,30 @@ ps aux | grep node
 
 ### Quick Fixes
 
-**When Things Break:**
+**When PDF Generation Breaks:**
+```bash
+# 1. Restart PDF server
+pkill -f "pdf-server"
+npm run pdf-server
+
+# 2. Clear Puppeteer cache
+rm -rf .cache/puppeteer
+npm install puppeteer
+
+# 3. Test with minimal HTML
+# (use testMinimalPDF() function in browser console)
+
+# 4. Check port conflicts
+lsof -i :3001
+```
+
+**When Both Servers Break:**
 ```bash
 # Nuclear option: Complete reset
-rm -rf node_modules package-lock.json
-npm install
-npm run dev
-
-# Fix Git issues
-git reset --hard HEAD
-git clean -fd
-
-# Fix file permissions (if needed)
-chmod -R 755 src/
-chmod +x scripts/*.sh
-```
-
-### Recovery Commands
-
-**Recover Lost Work:**
-```bash
-# Check Git reflog for lost commits
-git reflog
-
-# Recover from reflog
-git reset --hard HEAD@{2}
-
-# Check stash for saved work
-git stash list
-git stash show -p stash@{0}
-
-# Recover deleted files
-git checkout HEAD -- filename
-```
-
-**Emergency Debugging:**
-```bash
-# Enable debug mode
-DEBUG=* npm run dev
-
-# Verbose logging
-npm run dev -- --debug
-
-# Check system resources
-top
-df -h
-```
-
-### Reset Procedures
-
-**Complete Project Reset:**
-```bash
-# 1. Backup current state
-git stash save "Emergency backup $(date)"
-
-# 2. Reset to last known good state
-git reset --hard HEAD~1
-
-# 3. Clean everything
+pkill -f node
 rm -rf node_modules package-lock.json .vite/
-
-# 4. Fresh install
 npm install
-
-# 5. Test basic functionality
-npm run dev
+npm run dev-all
 ```
 
 ---
@@ -810,12 +844,12 @@ npm run dev
 
 **Daily Commands:**
 ```bash
-# Start development
-npm run dev
+# Start both servers
+npm run dev-all
 
-# Test Airtable connection
-# (in browser console)
+# Test systems (in browser console)
 DevHelpers.testGiltyBoyData()
+window.app.exportManager.checkServerStatus()
 
 # Check code quality
 npm run lint
@@ -824,32 +858,32 @@ npm run lint
 git add . && git commit -m "message" && git push
 ```
 
-**Troubleshooting Commands:**
+**PDF-Specific Commands:**
 ```bash
-# Clean restart
-rm -rf node_modules && npm install && npm run dev
+# Start only PDF server
+npm run pdf-server
 
-# Check environment
-DevHelpers.checkEnvironmentSetup()
+# Test PDF server
+curl http://localhost:3001/api/health
 
-# Clear caches
-npm cache clean --force
+# Restart PDF server
+pkill -f "pdf-server" && npm run pdf-server
+
+# Check PDF server logs
+# (watch terminal running npm run pdf-server)
 ```
 
-### Keyboard Shortcuts
+**Troubleshooting Commands:**
+```bash
+# Clean restart everything
+pkill -f node && npm run dev-all
 
-**In Development Server Terminal:**
-- `r` - Restart server
-- `u` - Show server URL
-- `o` - Open in browser
-- `c` - Clear console
-- `q` - Quit server
+# Clear all caches
+npm cache clean --force && rm -rf .vite/ .cache/
 
-**In Browser:**
-- `F12` - DevTools
-- `Ctrl+R` - Refresh
-- `Ctrl+Shift+R` - Hard refresh
-- `Ctrl+Shift+I` - Toggle DevTools
+# Test environment
+DevHelpers.checkEnvironmentSetup()
+```
 
 ### Useful Aliases
 
@@ -857,29 +891,29 @@ npm cache clean --force
 ```bash
 # Project shortcuts
 alias gb="cd ~/path/to/gilty-boy/linesheet-builder"
-alias gbdev="gb && npm run dev"
+alias gbdev="gb && npm run dev-all"  # Updated to start both servers
 alias gbtest="gb && npm test"
-alias gbpush="gb && git add . && git commit -m 'Quick save' && git push"
+alias gbpdf="gb && npm run pdf-server"  # PDF server only
+alias gbkill="pkill -f node"  # Kill all Node processes
 
 # Quick commands
-alias ll="ls -la"
-alias ..="cd .."
-alias gst="git status"
-alias glog="git log --oneline -10"
+alias pdftest="curl http://localhost:3001/api/health"
+alias vitetest="curl http://localhost:5173"
 ```
 
 ---
 
 ## 💡 Pro Tips
 
-1. **Always test Airtable connection first** - Run `DevHelpers.testGiltyBoyData()` before making changes
-2. **Use browser DevTools Network tab** - Monitor API calls when debugging connection issues
-3. **Keep .env file secure** - Never commit it to Git
-4. **Commit frequently** - Small, focused commits are easier to debug
-5. **Use meaningful branch names** - `feature/pdf-export` not `fix-stuff`
-6. **Test in incognito mode** - Helps identify caching issues
-7. **Monitor console for errors** - JavaScript errors can break functionality silently
+1. **Always start both servers** - Use `npm run dev-all` to avoid PDF export issues
+2. **Monitor PDF server logs** - Watch for Puppeteer errors and memory issues
+3. **Test PDF export early** - Generate a simple preview and export PDF to verify system health
+4. **Use server health checks** - Run `window.app.exportManager.checkServerStatus()` when debugging
+5. **Clear Puppeteer cache if PDFs look wrong** - `rm -rf .cache/puppeteer && npm install puppeteer`
+6. **Check port conflicts** - PDF server needs port 3001, Vite needs 5173
+7. **Test with minimal HTML first** - Use `testMinimalPDF()` function to isolate issues
+8. **Keep an eye on memory usage** - Puppeteer can be memory-intensive with large catalogs
 
 ---
 
-*Last updated: $(date +"%Y-%m-%d")*
+*Last updated: 2025-01-24*
