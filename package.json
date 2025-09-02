@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Professional wholesale line sheet generator with Airtable integration",
   "main": "src/index.js",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
