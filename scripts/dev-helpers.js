@@ -413,6 +413,23 @@ export class DevHelpers {
     }
   }
 
+  async debugPDFGeneration() {
+    console.log('🔍 PDF Generation Debug Info:');
+    console.log('- Products loaded:', this.stateManager.getState().products.length);
+    console.log('- Preview content exists:', !!document.getElementById('linesheet-preview-content')?.innerHTML.trim());
+    console.log('- Puppeteer available:', await this.exportManager.puppeteerGenerator.isReady());
+    console.log('- Current export method:', this.exportManager.getExportMethod());
+    
+    // Test HTML generation
+    try {
+      const html = this.linesheetGenerator.generateLinesheetHTML();
+      console.log('- HTML generation: ✅ Success');
+      console.log('- HTML length:', html.length);
+    } catch (error) {
+      console.log('- HTML generation: ❌ Failed -', error.message);
+    }
+  }
+
   static logDebugInfo() {
     console.log('🐛 Debug Information:');
     console.log('');

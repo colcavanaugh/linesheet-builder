@@ -9,10 +9,35 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Cardo:ital,wght@0,400;0,700;1,400&family=Sorts+Mill+Goudy:ital@0;1&display=swap" rel="stylesheet">
     
-    <!-- Add PDF generation libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-</head>
+    <!-- Add PDF generation libraries with fallbacks -->
+    <script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <!-- Fallback CDN with better jsPDF handling -->
+    <script>
+      // Check if libraries loaded, if not try alternative CDN
+      window.addEventListener('load', function() {
+        if (typeof window.html2canvas === 'undefined') {
+          console.log('Loading html2canvas from alternative CDN...');
+          const script1 = document.createElement('script');
+          script1.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+          document.head.appendChild(script1);
+        }
+        
+        // jsPDF has different global exposure patterns, try multiple approaches
+        if (typeof window.jsPDF === 'undefined' && typeof window.jspdf === 'undefined') {
+          console.log('Loading jsPDF from alternative CDN...');
+          const script2 = document.createElement('script');
+          script2.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+          script2.onload = function() {
+            console.log('Alternative jsPDF loaded, checking global availability...');
+            console.log('window.jsPDF:', typeof window.jsPDF);
+            console.log('window.jspdf:', typeof window.jspdf);
+            console.log('window.pdf:', typeof window.pdf);
+          };
+          document.head.appendChild(script2);
+        }
+      });
+    </script>
 <body>
     <!-- Header -->
     <header class="app-header">
@@ -110,7 +135,7 @@
                         <div class="export-controls">
                             <button id="export-pdf" class="btn btn-primary" disabled>
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 0 0 0 2-2V8z"></path>
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 1 2 -2V8z"></path>
                                     <polyline points="14,2 14,8 20,8"></polyline>
                                     <line x1="16" y1="13" x2="8" y2="13"></line>
                                     <line x1="16" y1="17" x2="8" y2="17"></line>

@@ -15,9 +15,23 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    open: true
+    open: true,
+    // Enable CORS for local development with Puppeteer
+    cors: true,
+    headers: {
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+      'Cross-Origin-Opener-Policy': 'same-origin'
+    }
   },
   css: {
-    postcss: './postcss.config.js'
+    postcss: './postcss.config.cjs'
+  },
+  optimizeDeps: {
+    exclude: ['puppeteer'] // Don't try to optimize Puppeteer for browser
+  },
+  
+  define: {
+    // Define environment variables for Puppeteer detection
+    __PUPPETEER_AVAILABLE__: 'typeof window !== "undefined" && window.require !== undefined'
   }
 })
