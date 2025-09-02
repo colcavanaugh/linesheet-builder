@@ -4,7 +4,6 @@
   "type": "module",
   "description": "Professional wholesale line sheet generator with Airtable integration",
   "main": "src/index.js",
-  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -34,7 +33,6 @@
   "author": "Col Cavanaugh",
   "license": "MIT",
   "dependencies": {
-    "airtable": "^0.12.2",
     "axios": "^1.7.7",
     "cors": "^2.8.5",
     "date-fns": "^3.6.0",
@@ -54,7 +52,7 @@
     "prettier": "^3.3.3",
     "tailwindcss": "^3.4.13",
     "typescript": "^5.6.2",
-    "vite": "^7.0.5",
+    "vite": "^6.0.7",
     "vitest": "^3.2.4"
   },
   "puppeteer": {

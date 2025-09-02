@@ -23,7 +23,7 @@ import NotificationManager from './ui/NotificationManager.js';
 import LinesheetGenerator from './generators/LinesheetGenerator.js';
 
 // Export modules
-import { PuppeteerGenerator } from './utils/pdf/PuppeteerGenerator.js';
+// import { PuppeteerGenerator } from './utils/pdf/PuppeteerGenerator.js';
 
 
 class LineSheetApp {
@@ -49,7 +49,7 @@ class LineSheetApp {
     this.eventManager = new EventManager(this);
 
     // Initialize Puppeteer PDF generator
-    this.pdfGenerator = new PuppeteerGenerator();
+    // this.pdfGenerator = new PuppeteerGenerator();
     
     this.init();
   }

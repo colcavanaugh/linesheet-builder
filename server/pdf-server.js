@@ -367,7 +367,7 @@ function getFallbackCSS() {
       break-inside: avoid;
     }
     @media print {
-      * { -webkit-print-color-adjust: exact !important; color-adjust: exact !important; }
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     }
   `;
 }

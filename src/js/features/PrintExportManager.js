@@ -104,7 +104,7 @@ export class PrintExportManager {
         @media print {
             * {
                 -webkit-print-color-adjust: exact !important;
-                color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
             
             /* High-resolution image rendering */
@@ -295,7 +295,7 @@ export class PrintExportManager {
                 object-fit: cover !important;
                 object-position: center !important;
                 -webkit-print-color-adjust: exact !important;
-                color-adjust: exact !important;
+                print-color-adjust: exact !important;
                 image-rendering: -webkit-optimize-contrast !important;
             }
             

@@ -431,7 +431,7 @@ Your existing CSS in `linesheet-document.css` is already print-optimized. Add th
   .linesheet-preview-content {
     /* Ensure consistent rendering */
     -webkit-print-color-adjust: exact;
-    color-adjust: exact;
+    print-color-adjust: exact;
   }
   
   .product-image {
