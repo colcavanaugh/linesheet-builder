@@ -86,7 +86,7 @@ export class PreviewManager {
       
       // Use the EXISTING preview panel from your HTML (not create a new one)
       const previewPanel = document.getElementById('linesheet-preview-panel');
-      const previewContent = document.getElementById('linesheet-preview-content');
+      const previewContent = document.getElementById('linesheet-preview-content-container');
       
       if (!previewPanel) {
         throw new Error('Preview panel not found in HTML');
@@ -170,7 +170,7 @@ export class PreviewManager {
         </div>
       </div>
       <div class="preview-panel-content">
-        <div id="linesheet-preview-content" class="linesheet-preview-content">
+        <div id="linesheet-preview-content-container" class="linesheet-preview-content-container">
           <!-- Preview content will be inserted here -->
         </div>
       </div>

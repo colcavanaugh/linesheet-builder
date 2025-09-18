@@ -18,73 +18,61 @@ async function inlineCSS(html) {
     const cssContent = fs.readFileSync(cssPath, 'utf8');
     
     const pdfOverrides = `
-      /* PDF Export Overrides - Clean Professional Layout */
+      /* PDF Export Overrides - Minimal, Cover Page Focus */
+      .cover-page{
+        padding-top: 0;
+        transform: translate(-8px, 0);
+      }
+     
+      /* Respect different card layouts */
+      .linesheet-product-card.portrait {
+        display: flex !important;
+        flex-direction: row !important;
+        width: 300px !important;
+        height: 300px !important;
+      }
       
-      /* Remove preview container styling */
-      .linesheet-preview-content {
+        /* Portrait-specific image sizing */
+      .linesheet-product-card.portrait .product-image-container {
+        width: 60% !important;
+        height: 100% !important;
+      }
+      
+      .linesheet-product-card.portrait .product-info {
+        width: 40% !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding-left: 8px !important;
+      }
+
+      .linesheet-product-card.landscape {
+        display: block !important;
+        width: 300px !important;
+        height: 300px !important;
+      }
+      
+      /* Fix image container sizing */
+      .linesheet-product-card.landscape .product-image-container {
         width: 100% !important;
+        height: 60% !important;
+        position: relative !important;
+      }
+      
+      /* Fix product info sizing */
+      .linesheet-product-card.landscape .product-info {
+        width: 100% !important;
+        height: 40% !important;
         margin: 0 !important;
-        box-shadow: none !important;
-        background: white !important;
+        padding: 0 !important;
+        position: relative !important;
       }
       
-      /* Remove preview page styling and add proper print margins */
-      .cover-page,
-      .table-of-contents,
-      .category-section {
-        /* Remove preview styling */
-        margin: 0 !important;
-        border: none !important;
-        box-shadow: none !important;
-        
-        /* Add professional print margins */
-        padding: 0.75in !important;
-        
-        /* Ensure full page usage */
-        width: 8.5in !important;
-        height: 11in !important;
-        
-        /* Clean white background */
-        background: white !important;
-      }
-      
-      /* Scale up cover page content for better page utilization */
-      .cover-content {
-        max-width: 6in !important;  /* Increased from 5in */
-        transform: scale(1.2) !important;  /* Scale up 20% */
-        transform-origin: center !important;
-      }
-      
-      /* Increase font sizes for better readability */
-      .brand-name {
-        font-size: 56pt !important;  /* Increased from 48pt */
-      }
-      
-      .brand-tagline {
-        font-size: 18pt !important;  /* Increased from 16pt */
-      }
-      
-      .brand-statement {
-        font-size: 13pt !important;  /* Increased from 11pt */
-        line-height: 1.5 !important;
-      }
-      
-      .ordering-instructions {
-        font-size: 12pt !important;  /* Slightly larger */
-      }
-      
-      .artist-info {
-        font-size: 12pt !important;
-      }
-      
-      /* Remove preview indicators completely */
-      .cover-page::before,
-      .table-of-contents::before,
-      .category-section::before {
-        display: none !important;
+      .product-image {
+        width: 100% !important;
+        height: 100% !important;
       }
     `;
-        
+            
     const result = html.replace(
       /<link rel="stylesheet" href="styles\/themes\/linesheet-document\.css">/,
       `<style>${cssContent}${pdfOverrides}</style>`
@@ -363,14 +351,14 @@ class PDFServer {
         printBackground: true,
         preferCSSPageSize: false,
         margin: {
-          top: '0.75in',     // Remove Puppeteer margins
-          bottom: '0.75in',
-          left: '0.75in', 
-          right: '0.75in'
+          top: '0in',     // Remove Puppeteer margins
+          bottom: '0in',
+          left: '0in', 
+          right: '0in'
         },
         displayHeaderFooter: false,
         timeout: 120000,
-        scale: 0.8
+        scale: 1
       };
 
       console.log('📊 PDF generation options:', pdfOptions);

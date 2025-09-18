@@ -41,9 +41,15 @@ export class LinesheetGenerator {
       </head>
       <body class="linesheet-document">
         <div class="linesheet-preview-content">
-          ${coverPageHTML}
-          ${tocHTML}
-          ${catalogHTML}
+          <div class="coverpage-html">  
+            ${coverPageHTML}
+          </div>
+          <div class="toc-html">
+            ${tocHTML}
+          </div>
+          <div class="catalog-html">
+            ${catalogHTML}
+          </div>
         </div>
       </body>
       </html>

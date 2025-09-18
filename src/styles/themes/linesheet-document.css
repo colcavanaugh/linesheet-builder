@@ -20,8 +20,8 @@
   --paper-width: 8.5in;
   --paper-height: 11in;
   --paper-margin: 0.75in;
-  --content-width: 7in;   /* 8.5" - (0.75" * 2) */
-  --content-height: 9.5in; /* 11" - (0.75" * 2) */
+  --content-width: 8.5in;   /* 8.5" - (0.75" * 2) */
+  --content-height: 11in; /* 11" - (0.75" * 2) */
   
   /* Typography optimized for print */
   --linesheet-font-size-base: 12pt;
@@ -37,7 +37,7 @@
 
 /* ===== BASE LINESHEET DOCUMENT WITH PAPER SIZING ===== */
 
-.linesheet-preview-content {
+.linesheet-preview-content-container {
   font-family: 'Cardo', serif;
   font-size: var(--linesheet-font-size-base);
   line-height: var(--linesheet-line-height);
@@ -330,7 +330,6 @@
   height: 80%;
   align-items: center;
   justify-content: center;
-  margin: -20px;
 }
 
 /* CRITICAL: 2x2 grid layout fitting in 70% of page body */
@@ -348,7 +347,7 @@
 .linesheet-preview-content .linesheet-product-card {
   background: var(--bg-primary, white);
   border: 1px solid var(--border-color, #ddd);
-  border-radius: 3pt;
+  border-radius: 1pt;
   overflow: hidden;
   aspect-ratio: 1 / 1;
   width: 100%;
@@ -356,12 +355,6 @@
   position: relative;
   page-break-inside: avoid;
   break-inside: avoid;
-  box-shadow: var(--shadow-md, 0 1pt 3pt rgba(0,0,0,0.1));
-}
-
-.linesheet-preview-content .linesheet-product-card:hover {
-  /* transform: translateY(-2px); */
-  /* box-shadow: var(--shadow-lg, 0 4px 12px rgba(0,0,0,0.15)); */
 }
 
 /* LANDSCAPE ORIENTATION - matches .product-card--landscape */
@@ -419,9 +412,8 @@
 .linesheet-preview-content .product-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: center;
-  transition: transform var(--transition-normal, 0.3s ease);
+  /* object-fit: cover;
+  object-position: center; */
 }
 
 .linesheet-preview-content .linesheet-product-card:hover .product-image {
