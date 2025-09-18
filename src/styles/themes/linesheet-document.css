@@ -425,7 +425,9 @@
 }
 
 .linesheet-preview-content .linesheet-product-card:hover .product-image {
-  /* transform: scale(1.05); */
+  image-rendering: -webkit-optimize-contrast !important;
+  image-rendering: crisp-edges !important;
+  image-rendering: pixelated !important;
 }
 
 .linesheet-preview-content .product-info {

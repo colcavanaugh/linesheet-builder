@@ -67,7 +67,7 @@ export class EventManager {
     const exportPDFButton = document.getElementById('export-pdf');
     if (exportPDFButton) {
       exportPDFButton.addEventListener('click', async () => {
-        await this.exportManager.exportPDF();
+        await this.app.exportManager.exportToPDF();
       });
     }
 

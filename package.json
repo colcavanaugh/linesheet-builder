@@ -18,6 +18,8 @@
     "audit-fix": "npm audit fix",
     "update-deps": "npm update",
     "pdf-server": "node server/pdf-server.js",
+    "pdf-server-dev": "nodemon server/pdf-server.js",
+    "pdf-server-test": "node server/pdf-server-test.js",
     "dev-all": "concurrently \"npm run dev\" \"npm run pdf-server\"",
     "setup-pdf": "node scripts/setup-pdf.js"
   },
@@ -48,6 +50,7 @@
     "autoprefixer": "^10.4.20",
     "concurrently": "^8.2.2",
     "eslint": "^8.57.0",
+    "nodemon": "^3.1.10",
     "postcss": "^8.4.47",
     "prettier": "^3.3.3",
     "tailwindcss": "^3.4.13",
